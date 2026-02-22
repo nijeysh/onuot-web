@@ -1,80 +1,77 @@
-import { ChevronLeft, ChevronRight, Home, Map, Clock, Calendar, Settings, Info, X } from 'lucide-react';
-
-export type PageType = 'home' | 'regional' | 'hourly' | 'weekly' | 'settings' | 'info';
-
-interface SidebarProps {
-  isOpen: boolean;
-  onToggle: () => void;
-  currentPage: PageType;
-  onPageChange: (page: PageType) => void;
-  isCompact?: boolean;
-}
+export type PageType = 'dashboard' | 'calendar' | 'chat' | 'ootd' | 'settings';
 
 interface MenuItem {
-  icon: React.ReactNode;
+  icon: string;
   label: string;
   page: PageType;
+  badge?: number;
 }
 
-const Sidebar = ({ isOpen, onToggle, currentPage, onPageChange, isCompact = false }: SidebarProps) => {
+interface SidebarProps {
+  currentPage: PageType;
+  onPageChange: (page: PageType) => void;
+}
+
+const Sidebar = ({ currentPage, onPageChange }: SidebarProps) => {
   const menuItems: MenuItem[] = [
-    { icon: <Home size={20} />, label: '홈', page: 'home' },
-    { icon: <Map size={20} />, label: '지역별 날씨', page: 'regional' },
-    { icon: <Clock size={20} />, label: '시간별 예보', page: 'hourly' },
-    { icon: <Calendar size={20} />, label: '주간 예보', page: 'weekly' },
-    { icon: <Settings size={20} />, label: '설정', page: 'settings' },
-    { icon: <Info size={20} />, label: '정보', page: 'info' }
+    { icon: 'grid_view', label: 'Dashboard', page: 'dashboard' },
+    { icon: 'calendar_month', label: 'Calendar', page: 'calendar' },
+    { icon: 'forum', label: 'Chat', page: 'chat', badge: 3 },
+    { icon: 'checkroom', label: 'OOTD', page: 'ootd' },
+    { icon: 'settings', label: 'Settings', page: 'settings' },
   ];
 
-  const handleMenuClick = (e: React.MouseEvent, page: PageType) => {
-    e.preventDefault();
-    onPageChange(page);
-  };
-
-  const sidebarClass = isCompact
-    ? `sidebar sidebar-compact ${isOpen ? 'sidebar-compact-open' : ''}`
-    : `sidebar ${isOpen ? 'sidebar-open' : 'sidebar-closed'}`;
-
   return (
-    <aside className={sidebarClass}>
-      {isCompact ? (
-        <div className="sidebar-compact-header">
-          <span className="sidebar-compact-title">메뉴</span>
-          <button
-            className="sidebar-close"
-            onClick={onToggle}
-            aria-label="메뉴 닫기"
-          >
-            <X size={24} />
-          </button>
+    <aside className="w-20 lg:w-64 flex flex-col justify-between bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 h-full transition-all duration-300 z-20 shrink-0">
+      <div className="flex flex-col h-full">
+        {/* Logo Area */}
+        <div className="h-20 flex items-center justify-center lg:justify-start lg:px-6 border-b border-slate-100 dark:border-slate-800">
+          <div className="bg-primary/20 p-2 rounded-lg text-primary">
+            <span className="material-symbols-outlined text-[28px]">cloud</span>
+          </div>
+          <span className="ml-3 text-xl font-bold tracking-tight hidden lg:block text-slate-800 dark:text-slate-100">SkyCast</span>
         </div>
-      ) : (
-        <button
-          className="sidebar-toggle"
-          onClick={onToggle}
-          aria-label={isOpen ? '사이드바 접기' : '사이드바 펼치기'}
-        >
-          {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-        </button>
-      )}
 
-      <nav className="sidebar-nav">
-        <ul className="sidebar-menu">
+        {/* User Profile (Compact) */}
+        <div className="p-4 flex flex-col items-center lg:items-start border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-3 w-full">
+            <div
+              className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 shrink-0 ring-2 ring-white dark:ring-slate-700 shadow-sm"
+              style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBkrvkO03WFaE-c0oiUIwrSbt-ersICX9U_U4ioac899RuYREzEdhUH52Qks-5VWPBcYV4ejbOKIh1TBkbJSo6pFDQMXFwOkIXAv7YWcUzozQQKX6a50G7gCUAWDO9Fz4786lR4wnHAr1ZCny2WaL9IHfXemeCSjy6NmPLfjTDRMLV5RCjM2-Ni9kNn6ODcc_jV5ALv-YcFaS3ZKfCzEW-K6Og7wMuEdUgUHtarnvdsnnfO7DP61eA6i3WpdtfHQ9DzkD3yNTSOTdnk")' }}
+            ></div>
+            <div className="flex-col hidden lg:flex">
+              <h1 className="text-slate-900 dark:text-slate-100 text-sm font-semibold leading-tight">Sarah J.</h1>
+              <p className="text-slate-500 text-xs font-medium">San Francisco, CA</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Links */}
+        <nav className="flex-1 flex flex-col gap-2 p-3 overflow-y-auto">
           {menuItems.map((item) => (
-            <li key={item.page}>
-              <a
-                href={`#${item.page}`}
-                className={`sidebar-menu-item ${currentPage === item.page ? 'active' : ''}`}
-                title={item.label}
-                onClick={(e) => handleMenuClick(e, item.page)}
-              >
-                <span className="sidebar-menu-icon">{item.icon}</span>
-                {(isOpen || isCompact) && <span className="sidebar-menu-label">{item.label}</span>}
-              </a>
-            </li>
+            <button
+              key={item.page}
+              onClick={() => onPageChange(item.page)}
+              className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors group ${currentPage === item.page
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
+                }`}
+            >
+              <span className={`material-symbols-outlined text-[24px] ${currentPage === item.page ? 'fill-current' : ''}`}>
+                {item.icon}
+              </span>
+              <span className={`text-sm hidden lg:block ${currentPage === item.page ? 'font-semibold' : 'font-medium'}`}>
+                {item.label}
+              </span>
+              {item.badge && (
+                <span className="ml-auto bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden lg:block">
+                  {item.badge}
+                </span>
+              )}
+            </button>
           ))}
-        </ul>
-      </nav>
+        </nav>
+      </div>
     </aside>
   );
 };

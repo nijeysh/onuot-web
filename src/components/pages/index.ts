@@ -1,6 +1,5 @@
-export { default as HomePage } from './HomePage';
-export { default as RegionalPage } from './RegionalPage';
-export { default as HourlyPage } from './HourlyPage';
-export { default as WeeklyPage } from './WeeklyPage';
+export { default as Dashboard } from './Dashboard';
+export { default as CalendarPage } from './CalendarPage';
+export { default as ChatPage } from './ChatPage';
+export { default as OOTDPage } from './OOTDPage';
 export { default as SettingsPage } from './SettingsPage';
-export { default as InfoPage } from './InfoPage';

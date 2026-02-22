@@ -1,16 +1,11 @@
 import { useState } from 'react';
 import { Layout, type PageType } from './components/layout';
-import { HomePage, RegionalPage, HourlyPage, WeeklyPage, SettingsPage, InfoPage } from './components/pages';
-import { getWeatherData } from './services/weatherApi';
+import { Dashboard, CalendarPage, ChatPage, OOTDPage, SettingsPage } from './components/pages';
+import { ThemeProvider } from './contexts/ThemeContext';
 import './App.css';
 
-function App() {
-  const [weatherData, setWeatherData] = useState(() => getWeatherData());
-  const [currentPage, setCurrentPage] = useState<PageType>('home');
-
-  const handleRefresh = () => {
-    setWeatherData(getWeatherData());
-  };
+function AppContent() {
+  const [currentPage, setCurrentPage] = useState<PageType>('dashboard');
 
   const handlePageChange = (page: PageType) => {
     setCurrentPage(page);
@@ -18,35 +13,36 @@ function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'home':
-        return <HomePage weatherData={weatherData} />;
-      case 'regional':
-        return <RegionalPage />;
-      case 'hourly':
-        return <HourlyPage data={weatherData.hourly} />;
-      case 'weekly':
-        return <WeeklyPage data={weatherData.daily} />;
+      case 'dashboard':
+        return <Dashboard />;
+      case 'calendar':
+        return <CalendarPage />;
+      case 'chat':
+        return <ChatPage />;
+      case 'ootd':
+        return <OOTDPage />;
       case 'settings':
         return <SettingsPage />;
-      case 'info':
-        return <InfoPage />;
       default:
-        return <HomePage weatherData={weatherData} />;
+        return <Dashboard />;
     }
   };
 
   return (
     <Layout
-      city={weatherData.location.city}
-      district={weatherData.location.district}
-      updatedAt={weatherData.updatedAt}
-      onRefresh={handleRefresh}
-      isLoading={false}
       currentPage={currentPage}
       onPageChange={handlePageChange}
     >
       {renderPage()}
     </Layout>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 
