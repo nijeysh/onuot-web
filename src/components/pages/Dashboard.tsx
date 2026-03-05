@@ -118,7 +118,7 @@ const Dashboard = () => {
                     {/* Active item */}
                     <div className="snap-start shrink-0 min-w-[80px] p-3 bg-primary text-white rounded-xl flex flex-col items-center gap-2 shadow-lg shadow-primary/30 transform scale-105">
                         <span className="text-xs font-medium opacity-90">Now</span>
-                        <span className="material-symbols-outlined text-white" style={{ fontSize: '32px', fontVariationSettings: "'FILL' 1", filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.4))' }}>wb_sunny</span>
+                        <span className="material-symbols-outlined text-white icon-hourly-now">wb_sunny</span>
                         <span className="text-lg font-bold">72°</span>
                     </div>
                     {/* Other hours */}

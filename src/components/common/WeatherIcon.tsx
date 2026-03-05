@@ -108,15 +108,10 @@ const WeatherIcon = ({ condition, size = 40, className = '' }: WeatherIconProps)
 
   return (
     <span
-      className={`material-symbols-outlined select-none ${colorClass} ${className}`}
+      className={`material-symbols-outlined select-none icon-base ${colorClass} ${className}`}
       style={{
         fontSize: `${size}px`,
         filter: glowStyle,
-        fontVariationSettings: "'FILL' 1, 'wght' 400",
-        lineHeight: 1,
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
       }}
       aria-label={WEATHER_LABELS[condition]}
       role="img"

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Layout, type PageType } from './components/layout';
 import { Dashboard, CalendarPage, ChatPage, OOTDPage, SettingsPage } from './components/pages';
 import { ThemeProvider } from './contexts/ThemeContext';
-import './App.css';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState<PageType>('dashboard');

@@ -1,3 +1,7 @@
+/* ═══════════════════════════════════════════════════════════
+   Tailwind + Design Tokens
+   ═══════════════════════════════════════════════════════════ */
+
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -16,7 +20,10 @@
   }
 }
 
-/* Custom scrollbar for better aesthetics */
+/* ═══════════════════════════════════════════════════════════
+   Custom Scrollbar
+   ═══════════════════════════════════════════════════════════ */
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -35,11 +42,37 @@
   background: #94a3b8;
 }
 
-/* Dark mode scrollbar */
 .dark ::-webkit-scrollbar-thumb {
   background: #334155;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #475569;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Material Symbols Utilities
+   ═══════════════════════════════════════════════════════════ */
+
+/* Base icon style — filled, centered inline-flex */
+.icon-base {
+  font-variation-settings: 'FILL' 1, 'wght' 400;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ThemeToggle icon — small, heavier weight */
+.icon-toggle {
+  font-size: 16px;
+  font-variation-settings: 'FILL' 1, 'wght' 500;
+  line-height: 1;
+}
+
+/* Dashboard "Now" hourly icon — 32px, filled, white glow */
+.icon-hourly-now {
+  font-size: 32px;
+  font-variation-settings: 'FILL' 1;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
 }
