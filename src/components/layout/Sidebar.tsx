@@ -29,7 +29,7 @@ const Sidebar = ({ currentPage, onPageChange }: SidebarProps) => {
           <div className="bg-primary/20 p-2 rounded-lg text-primary">
             <span className="material-symbols-outlined text-[28px]">cloud</span>
           </div>
-          <span className="ml-3 text-xl font-bold tracking-tight hidden lg:block text-slate-800 dark:text-slate-100">SkyCast</span>
+          <span className="ml-3 text-xl font-bold tracking-tight hidden lg:block text-slate-800 dark:text-slate-100">APPS</span>
         </div>
 
         {/* User Profile (Compact) */}
@@ -53,8 +53,8 @@ const Sidebar = ({ currentPage, onPageChange }: SidebarProps) => {
               key={item.page}
               onClick={() => onPageChange(item.page)}
               className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors group ${currentPage === item.page
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
+                ? 'bg-primary/10 text-primary'
+                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
                 }`}
             >
               <span className={`material-symbols-outlined text-[24px] ${currentPage === item.page ? 'fill-current' : ''}`}>
