@@ -58,7 +58,7 @@ const ICON_CONFIG: Record<WeatherCondition, IconConfig> = {
   },
   stormy: {
     symbol: 'thunderstorm',
-    colorClass: 'text-slate-600 dark:text-yellow-400',
+    colorClass: 'text-yellow-500',
     glowStyle: 'drop-shadow(0 0 14px rgba(251,191,36,0.5))',
   },
   foggy: {

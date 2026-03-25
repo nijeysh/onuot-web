@@ -20,7 +20,7 @@ const calendarData: CalendarDay[] = Array.from({ length: 31 }, (_, i) => {
         temp: 65 + (date % 10),
         event:
             date === 24 ? { label: 'OOTD Shooting', color: 'bg-primary/10 text-primary' } :
-                date === 15 ? { label: 'SF Hike', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' } :
+                date === 15 ? { label: 'SF Hike', color: 'bg-orange-500/10 text-orange-600' } :
                     undefined,
     };
 });
@@ -30,15 +30,15 @@ const CalendarPage = () => {
         <div className="flex flex-col gap-6 pt-4">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Weather Calendar</h1>
-                    <p className="text-slate-500 dark:text-slate-400 mt-1">Plan your outdoor activities with precision.</p>
+                    <h1 className="text-3xl font-bold text-text-heading tracking-tight">Weather Calendar</h1>
+                    <p className="text-text-secondary mt-1">Plan your outdoor activities with precision.</p>
                 </div>
-                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
-                    <button className="p-1 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg">
+                <div className="flex items-center gap-2 bg-surface px-4 py-2 rounded-xl shadow-sm border border-border-light">
+                    <button className="p-1 hover:bg-surface-hover rounded-lg">
                         <span className="material-symbols-outlined">chevron_left</span>
                     </button>
-                    <span className="font-bold text-slate-800 dark:text-slate-200">October 2023</span>
-                    <button className="p-1 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg">
+                    <span className="font-bold text-text">October 2023</span>
+                    <button className="p-1 hover:bg-surface-hover rounded-lg">
                         <span className="material-symbols-outlined">chevron_right</span>
                     </button>
                 </div>
@@ -46,9 +46,9 @@ const CalendarPage = () => {
 
             <Card padding={false} className="overflow-hidden">
                 {/* Day headers */}
-                <div className="grid grid-cols-7 border-b border-slate-100 dark:border-slate-800">
+                <div className="grid grid-cols-7 border-b border-border-light">
                     {days.map(day => (
-                        <div key={day} className="py-4 text-center text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 border-r last:border-r-0 border-slate-100 dark:border-slate-800">
+                        <div key={day} className="py-4 text-center text-xs font-bold uppercase tracking-wider text-text-muted border-r last:border-r-0 border-border-light">
                             {day}
                         </div>
                     ))}
@@ -60,17 +60,17 @@ const CalendarPage = () => {
                         return (
                             <div
                                 key={date}
-                                className={`min-h-[110px] p-2 border-r border-b last:border-r-0 border-slate-100 dark:border-slate-800 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50 ${isToday ? 'bg-primary/5 dark:bg-primary/10' : ''}`}
+                                className={`min-h-[110px] p-2 border-r border-b last:border-r-0 border-border-light transition-colors hover:bg-surface-hover ${isToday ? 'bg-primary/5' : ''}`}
                             >
                                 {/* Date number */}
                                 <div className="flex items-center justify-between mb-1">
-                                    <span className={`text-sm font-bold flex items-center justify-center w-7 h-7 rounded-full ${isToday ? 'bg-primary text-white' : 'text-slate-700 dark:text-slate-300'}`}>
+                                    <span className={`text-sm font-bold flex items-center justify-center w-7 h-7 rounded-full ${isToday ? 'bg-primary text-white' : 'text-text-secondary'}`}>
                                         {date}
                                     </span>
                                     {/* Stitch weather icon */}
                                     <div className="flex flex-col items-center">
                                         <WeatherIcon condition={condition} size={24} />
-                                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 -mt-1">{temp}°</span>
+                                        <span className="text-[10px] font-bold text-text-muted -mt-1">{temp}°</span>
                                     </div>
                                 </div>
                                 {/* Event pill */}

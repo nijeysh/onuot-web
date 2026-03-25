@@ -6,17 +6,100 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ─── Semantic Theme Tokens ────────────────────────────────
+   Light mode: :root  |  Dark mode: .dark
+   All components use these tokens instead of dark: modifiers
+   ──────────────────────────────────────────────────────────── */
+
+/* Light Mode (default) */
+:root {
+  --color-bg:              #f5f7f8;
+  --color-surface:         #ffffff;
+  --color-surface-alt:     #f8fafc;
+  --color-surface-hover:   #f8fafc;
+  --color-surface-glass:   rgba(255, 255, 255, 0.6);
+  --color-surface-glass-2: rgba(255, 255, 255, 0.7);
+
+  --color-text:            #0f172a;
+  --color-text-secondary:  #64748b;
+  --color-text-muted:      #94a3b8;
+  --color-text-heading:    #0f172a;
+
+  --color-border:          #e2e8f0;
+  --color-border-light:    #f1f5f9;
+  --color-border-glass:    rgba(226, 232, 240, 0.5);
+
+  --color-input-bg:        #f8fafc;
+  --color-bar-bg:          #e2e8f0;
+  --color-bar-border:      #cbd5e1;
+  --color-badge-bg:        rgba(255, 255, 255, 0.2);
+  --color-shadow:          rgba(6, 81, 237, 0.1);
+
+  --color-scrollbar:       #cbd5e1;
+  --color-scrollbar-hover: #94a3b8;
+}
+
+/* Dark Mode */
+.dark {
+  --color-bg:              #101c22;
+  --color-surface:         #0f172a;
+  --color-surface-alt:     rgba(255, 255, 255, 0.05);
+  --color-surface-hover:   #1e293b;
+  --color-surface-glass:   rgba(15, 23, 42, 0.6);
+  --color-surface-glass-2: rgba(15, 23, 42, 0.6);
+
+  --color-text:            #f1f5f9;
+  --color-text-secondary:  #94a3b8;
+  --color-text-muted:      #64748b;
+  --color-text-heading:    #ffffff;
+
+  --color-border:          #1e293b;
+  --color-border-light:    #1e293b;
+  --color-border-glass:    rgba(255, 255, 255, 0.1);
+
+  --color-input-bg:        #1e293b;
+  --color-bar-bg:          rgba(0, 0, 0, 0.2);
+  --color-bar-border:      rgba(255, 255, 255, 0.05);
+  --color-badge-bg:        rgba(15, 23, 42, 0.4);
+  --color-shadow:          transparent;
+
+  --color-scrollbar:       #334155;
+  --color-scrollbar-hover: #475569;
+}
+
 @theme {
   --color-primary: #3db8f5;
   --color-background-light: #f5f7f8;
   --color-background-dark: #101c22;
+
+  /* Semantic tokens mapped to CSS vars */
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-alt: var(--color-surface-alt);
+  --color-surface-hover: var(--color-surface-hover);
+  --color-surface-glass: var(--color-surface-glass);
+  --color-surface-glass-2: var(--color-surface-glass-2);
+
+  --color-text: var(--color-text);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-heading: var(--color-text-heading);
+
+  --color-border: var(--color-border);
+  --color-border-light: var(--color-border-light);
+  --color-border-glass: var(--color-border-glass);
+
+  --color-input-bg: var(--color-input-bg);
+  --color-bar-bg: var(--color-bar-bg);
+  --color-bar-border: var(--color-bar-border);
+  --color-badge-bg: var(--color-badge-bg);
 
   --font-display: "Plus Jakarta Sans", sans-serif;
 }
 
 @layer base {
   body {
-    @apply font-display text-slate-900 bg-background-light dark:bg-background-dark dark:text-slate-100 transition-colors duration-300;
+    @apply font-display text-text bg-bg transition-colors duration-300;
   }
 }
 
@@ -34,20 +117,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--color-scrollbar);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: var(--color-scrollbar-hover);
 }
 
 /* ═══════════════════════════════════════════════════════════

@@ -9,8 +9,10 @@ interface LayoutProps {
 }
 
 const Layout = ({ children, currentPage, onPageChange }: LayoutProps) => {
+  const isDashboard = currentPage === 'dashboard';
+
   return (
-    <div className="flex h-screen w-full bg-background-light dark:bg-background-dark overflow-hidden font-display">
+    <div className={`flex h-screen w-full overflow-hidden font-display ${!isDashboard ? 'bg-bg' : 'bg-transparent text-white'}`}>
       <Sidebar currentPage={currentPage} onPageChange={onPageChange} />
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         <Header />
