@@ -101,6 +101,9 @@
   body {
     @apply font-display text-text bg-bg transition-colors duration-300;
   }
+  button, [role="button"], select {
+    @apply cursor-pointer;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════

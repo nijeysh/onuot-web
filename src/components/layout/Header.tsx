@@ -1,8 +1,9 @@
 import ThemeToggle from '../common/ThemeToggle';
+import ProfileDropdown from './ProfileDropdown';
 
 const Header = () => {
   return (
-    <header className="h-20 shrink-0 px-6 lg:px-10 flex items-center justify-between bg-surface/80 backdrop-blur-md z-10 sticky top-0 border-b border-border-light">
+    <header className="h-20 shrink-0 px-6 lg:px-10 flex items-center justify-between bg-surface/80 backdrop-blur-md z-30 sticky top-0 border-b border-border-light">
       <div className="flex-1 max-w-xl">
         <div className="relative group">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -36,6 +37,8 @@ const Header = () => {
           <span className="material-symbols-outlined text-primary">add_circle</span>
           <span className="text-sm font-semibold text-text-secondary text-nowrap">New Post</span>
         </button>
+
+        <ProfileDropdown />
       </div>
     </header>
   );

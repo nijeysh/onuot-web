@@ -60,7 +60,7 @@ const CalendarPage = () => {
                         return (
                             <div
                                 key={date}
-                                className={`min-h-[110px] p-2 border-r border-b last:border-r-0 border-border-light transition-colors hover:bg-surface-hover ${isToday ? 'bg-primary/5' : ''}`}
+                                className={`min-h-[110px] p-2 border-r border-b last:border-r-0 border-border-light transition-colors hover:bg-surface-hover cursor-pointer ${isToday ? 'bg-primary/5' : ''}`}
                             >
                                 {/* Date number */}
                                 <div className="flex items-center justify-between mb-1">

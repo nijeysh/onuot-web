@@ -16,7 +16,7 @@ const OOTDPage = () => {
 
             <div className="flex flex-col gap-12 pb-20 mt-4">
                 {[1, 2, 3, 4].map(i => (
-                    <Card key={i} className="group overflow-hidden !p-0 border-none bg-surface/40 backdrop-blur-xl hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 rounded-3xl">
+                    <Card key={i} className="group overflow-hidden !p-0 border-none bg-surface/40 backdrop-blur-xl hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 rounded-3xl cursor-pointer">
                         {/* Header */}
                         <div className="p-5 flex items-center justify-between">
                             <div className="flex items-center gap-4">

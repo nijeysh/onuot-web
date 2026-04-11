@@ -1,4 +1,6 @@
-export type PageType = 'dashboard' | 'calendar' | 'chat' | 'ootd' | 'settings';
+import type { PageType } from '../../types/navigation';
+import { PAGE_TYPES } from '../../types/navigation';
+import { useNavigation } from '../../contexts/NavigationContext';
 
 interface MenuItem {
   icon: string;
@@ -7,18 +9,13 @@ interface MenuItem {
   badge?: number;
 }
 
-interface SidebarProps {
-  currentPage: PageType;
-  onPageChange: (page: PageType) => void;
-}
-
-const Sidebar = ({ currentPage, onPageChange }: SidebarProps) => {
+const Sidebar = () => {
+  const { currentPage, navigateTo } = useNavigation();
   const menuItems: MenuItem[] = [
-    { icon: 'grid_view', label: 'Dashboard', page: 'dashboard' },
-    { icon: 'calendar_month', label: 'Calendar', page: 'calendar' },
-    { icon: 'forum', label: 'Chat', page: 'chat', badge: 3 },
-    { icon: 'checkroom', label: 'OOTD', page: 'ootd' },
-    { icon: 'settings', label: 'Settings', page: 'settings' },
+    { icon: 'grid_view', label: 'Dashboard', page: PAGE_TYPES.DASHBOARD as PageType },
+    { icon: 'calendar_month', label: 'Calendar', page: PAGE_TYPES.CALENDAR as PageType },
+    { icon: 'chat', label: 'Chat', page: PAGE_TYPES.CHAT as PageType },
+    { icon: 'checkroom', label: 'OOTD Feed', page: PAGE_TYPES.OOTD as PageType },
   ];
 
   return (
@@ -51,7 +48,7 @@ const Sidebar = ({ currentPage, onPageChange }: SidebarProps) => {
           {menuItems.map((item) => (
             <button
               key={item.page}
-              onClick={() => onPageChange(item.page)}
+              onClick={() => navigateTo(item.page)}
               className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors group ${currentPage === item.page
                 ? 'bg-primary/10 text-primary'
                 : 'text-text-secondary hover:bg-surface-hover hover:text-text'

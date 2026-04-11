@@ -1,26 +1,23 @@
-import { useState } from 'react';
-import { Layout, type PageType } from './components/layout';
+import Layout from './components/layout/Layout';
 import { Dashboard, CalendarPage, ChatPage, OOTDPage, SettingsPage } from './components/pages';
+import { PAGE_TYPES } from './types/navigation';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { NavigationProvider, useNavigation } from './contexts/NavigationContext';
 
 function AppContent() {
-  const [currentPage, setCurrentPage] = useState<PageType>('dashboard');
-
-  const handlePageChange = (page: PageType) => {
-    setCurrentPage(page);
-  };
+  const { currentPage } = useNavigation();
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'dashboard':
+      case PAGE_TYPES.DASHBOARD:
         return <Dashboard />;
-      case 'calendar':
+      case PAGE_TYPES.CALENDAR:
         return <CalendarPage />;
-      case 'chat':
+      case PAGE_TYPES.CHAT:
         return <ChatPage />;
-      case 'ootd':
+      case PAGE_TYPES.OOTD:
         return <OOTDPage />;
-      case 'settings':
+      case PAGE_TYPES.SETTINGS:
         return <SettingsPage />;
       default:
         return <Dashboard />;
@@ -28,10 +25,7 @@ function AppContent() {
   };
 
   return (
-    <Layout
-      currentPage={currentPage}
-      onPageChange={handlePageChange}
-    >
+    <Layout>
       {renderPage()}
     </Layout>
   );
@@ -40,7 +34,9 @@ function AppContent() {
 function App() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <NavigationProvider>
+        <AppContent />
+      </NavigationProvider>
     </ThemeProvider>
   );
 }
