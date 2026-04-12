@@ -96,12 +96,16 @@ const OOTDPage = () => {
                                     <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden ring-1 ring-white/10 shrink-0">
                                         <img src={`https://i.pravatar.cc/150?u=current_user`} alt="me" className="w-full h-full object-cover" />
                                     </div>
-                                    <input
-                                        type="text"
-                                        placeholder="Add a comment..."
-                                        className="bg-transparent border-none text-sm w-full focus:ring-0 placeholder:text-text-muted/50 font-medium"
-                                    />
-                                    <button className="text-primary text-xs font-black uppercase tracking-wider opacity-60 hover:opacity-100 transition-opacity whitespace-nowrap px-2">Post</button>
+                                    <div className="relative flex-1 flex items-center">
+                                        <input
+                                            type="text"
+                                            placeholder="Add a comment..."
+                                            className="bg-surface-alt border border-white/10 rounded-full text-sm w-full py-2.5 pl-4 pr-12 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 placeholder:text-text-muted/60 font-medium transition-all shadow-inner"
+                                        />
+                                        <button className="absolute right-1.5 w-8 h-8 flex items-center justify-center bg-primary text-white rounded-full hover:bg-sky-500 hover:scale-110 active:scale-90 transition-all shadow-md">
+                                            <span className="material-symbols-outlined text-[18px] font-bold">arrow_upward</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

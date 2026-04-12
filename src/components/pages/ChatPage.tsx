@@ -86,14 +86,40 @@ const ChatPage = () => {
                     </div>
 
                     <div className="p-4 bg-surface-alt/50 border-t border-border-light">
-                        <div className="relative">
-                            <input
-                                className="w-full bg-surface border-none rounded-2xl py-4 pl-5 pr-14 text-sm focus:ring-2 focus:ring-primary/20 shadow-sm text-text"
-                                placeholder="Share an update or ask a question..."
-                                type="text"
-                            />
-                            <button className="absolute right-2 top-2 p-2 bg-primary text-white rounded-xl hover:bg-sky-500 transition-colors shadow-lg shadow-primary/20">
-                                <span className="material-symbols-outlined block">send</span>
+                        <div className="flex items-end gap-3">
+                            <div className="flex-1 bg-surface border border-border-light rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-primary/40 focus-within:border-primary/40 transition-all flex flex-col pt-1">
+                                <textarea
+                                    rows={1}
+                                    className="flex-1 bg-transparent border-none py-3 px-4 text-sm focus:ring-0 focus:outline-none resize-none max-h-[160px] overflow-y-auto text-text scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
+                                    placeholder="Share an update or ask a question..."
+                                    onInput={(e) => {
+                                        const target = e.target as HTMLTextAreaElement;
+                                        target.style.height = 'auto';
+                                        target.style.height = `${target.scrollHeight}px`;
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            const target = e.target as HTMLTextAreaElement;
+                                            target.value = '';
+                                            target.style.height = 'auto';
+                                        }
+                                    }}
+                                />
+                                <div className="flex items-center gap-1 px-2 pb-1.5 text-text-muted">
+                                    <button className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors">
+                                        <span className="material-symbols-outlined text-[20px]">add_circle</span>
+                                    </button>
+                                    <button className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors">
+                                        <span className="material-symbols-outlined text-[20px]">mood</span>
+                                    </button>
+                                    <button className="p-1.5 hover:bg-surface-hover rounded-lg transition-colors">
+                                        <span className="material-symbols-outlined text-[20px]">alternate_email</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <button className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-primary text-white rounded-full hover:bg-sky-500 hover:scale-105 active:scale-95 transition-all shadow-md shadow-primary/20 mb-1">
+                                <span className="material-symbols-outlined text-[24px]">send</span>
                             </button>
                         </div>
                     </div>
