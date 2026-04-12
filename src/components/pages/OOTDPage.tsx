@@ -5,7 +5,7 @@ const OOTDPage = () => {
         <div className="flex flex-col gap-8 pt-6 max-w-2xl mx-auto px-4 text-text">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6 mb-4">
                 <div>
-                    <h1 className="text-4xl font-black text-text-heading tracking-tight">OOTD FEED</h1>
+                    <h1 className="text-4xl font-black text-text-heading tracking-tight">OOTD</h1>
                     <p className="text-text-secondary mt-2 font-medium">Style inspiration based on today's local weather.</p>
                 </div>
                 <button className="flex items-center justify-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold shadow-xl shadow-primary/25 hover:bg-sky-500 hover:-translate-y-0.5 transition-all active:scale-95 group">
@@ -76,11 +76,11 @@ const OOTDPage = () => {
                                     <span className="material-symbols-outlined text-[22px]">share</span>
                                 </button>
                             </div>
-                            
+
                             <div className="space-y-4">
                                 <p className="text-[15px] text-text-secondary leading-[1.6]">
                                     <span className="font-extrabold text-text-heading mr-2 tracking-tight">StyleExplorer_{i}</span>
-                                    {i % 2 === 0 
+                                    {i % 2 === 0
                                         ? "Loving this minimalist look for the sunny SF afternoon. Lightweight fabrics are essential when the sun is out! ☀️✨"
                                         : "Denim and white is always a win. Ready for a coffee run and some golden hour shots! ☕📸"
                                     }
@@ -91,14 +91,14 @@ const OOTDPage = () => {
                                     <span>#SFStyles</span>
                                     <span>#StyleInspo</span>
                                 </div>
-                                
+
                                 <div className="pt-4 border-t border-white/5 flex items-center gap-3 text-text-muted">
                                     <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden ring-1 ring-white/10 shrink-0">
-                                            <img src={`https://i.pravatar.cc/150?u=current_user`} alt="me" className="w-full h-full object-cover" />
+                                        <img src={`https://i.pravatar.cc/150?u=current_user`} alt="me" className="w-full h-full object-cover" />
                                     </div>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Add a comment..." 
+                                    <input
+                                        type="text"
+                                        placeholder="Add a comment..."
                                         className="bg-transparent border-none text-sm w-full focus:ring-0 placeholder:text-text-muted/50 font-medium"
                                     />
                                     <button className="text-primary text-xs font-black uppercase tracking-wider opacity-60 hover:opacity-100 transition-opacity whitespace-nowrap px-2">Post</button>

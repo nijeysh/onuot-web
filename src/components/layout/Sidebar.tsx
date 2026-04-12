@@ -15,7 +15,7 @@ const Sidebar = () => {
     { icon: 'grid_view', label: 'Dashboard', page: PAGE_TYPES.DASHBOARD as PageType },
     { icon: 'calendar_month', label: 'Calendar', page: PAGE_TYPES.CALENDAR as PageType },
     { icon: 'chat', label: 'Chat', page: PAGE_TYPES.CHAT as PageType },
-    { icon: 'checkroom', label: 'OOTD Feed', page: PAGE_TYPES.OOTD as PageType },
+    { icon: 'checkroom', label: 'OOTD', page: PAGE_TYPES.OOTD as PageType },
   ];
 
   return (
