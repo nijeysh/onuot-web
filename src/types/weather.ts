@@ -1,13 +1,13 @@
 // 날씨 상태 타입
 export type WeatherCondition =
-  | 'clear'      // 맑음
-  | 'cloudy'     // 흐림
-  | 'partly-cloudy' // 구름조금
-  | 'rain'       // 비
-  | 'snow'       // 눈
-  | 'thunderstorm' // 뇌우
-  | 'fog'        // 안개
-  | 'drizzle';   // 이슬비
+  | 'sunny'
+  | 'partly_cloudy'
+  | 'cloudy'
+  | 'rainy'
+  | 'snowy'
+  | 'stormy'
+  | 'foggy'
+  | 'cyclone';
 
 // 현재 날씨 데이터
 export interface CurrentWeather {
@@ -17,9 +17,9 @@ export interface CurrentWeather {
   windSpeed: number;          // 풍속 (m/s)
   condition: WeatherCondition;
   description: string;        // 날씨 설명
-  pm10: number;               // 미세먼지 (μg/m³)
-  pm25: number;               // 초미세먼지 (μg/m³)
-  uvIndex: number;            // 자외선 지수
+  pm10?: number | null;       // 미세먼지 (μg/m³)
+  pm25?: number | null;       // 초미세먼지 (μg/m³)
+  uvIndex?: number | null;    // 자외선 지수
 }
 
 // 시간별 날씨 데이터
@@ -27,8 +27,11 @@ export interface HourlyWeather {
   time: string;               // 시간 (HH:00)
   temperature: number;
   condition: WeatherCondition;
+  description: string;
+  precipitation: number;
   precipProbability: number;  // 강수 확률 (%)
   humidity: number;
+  windSpeed: number;
 }
 
 // 일별 날씨 데이터
@@ -38,6 +41,8 @@ export interface DailyWeather {
   minTemp: number;            // 최저 기온
   maxTemp: number;            // 최고 기온
   condition: WeatherCondition;
+  description: string;
+  precipitation: number;
   precipProbability: number;  // 강수 확률 (%)
 }
 
