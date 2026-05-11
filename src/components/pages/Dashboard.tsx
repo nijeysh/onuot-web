@@ -28,6 +28,8 @@ const Dashboard = () => {
     const [weather, setWeather] = useState<WeatherData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [apiSource, setApiSource] = useState('KMA');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     useEffect(() => {
         let isMounted = true;
@@ -84,18 +86,49 @@ const Dashboard = () => {
         <div className="flex flex-col gap-6 pt-4 relative">
             <WeatherBackground condition={currentCondition} />
 
-            <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-2">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Weather Dashboard</h1>
-                    <p className="opacity-80 mt-1">기상청 API 기준 현재 날씨입니다.</p>
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 text-sm font-medium bg-badge-bg backdrop-blur-md px-3 py-1.5 rounded-lg shadow-sm border border-white/10">
-                        <span className="material-symbols-outlined text-[18px]">calendar_today</span>
-                        <span>{formatDate(weather?.updatedAt)}</span>
+            <Card variant="glass" className="mb-4 z-20 !overflow-visible">
+                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                    <div className="flex flex-col gap-2">
+                        <h1 className="text-3xl font-bold tracking-tight text-text-heading">Weather Dashboard</h1>
+                        <div className="relative">
+                            <div 
+                                className="inline-flex items-center gap-2 text-sm font-medium bg-surface-alt px-3 py-1.5 rounded-lg border border-border cursor-pointer hover:bg-surface-hover transition-colors text-text shadow-sm"
+                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            >
+                                <span className="opacity-80">데이터 제공:</span>
+                                <span className="font-bold text-primary">
+                                    {apiSource === 'KMA' ? '기상청 (KMA)' : apiSource === 'ACCUWEATHER' ? 'AccuWeather' : 'OpenWeather'}
+                                </span>
+                                <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                            </div>
+                            
+                            {isDropdownOpen && (
+                                <div className="absolute top-full left-0 mt-2 w-[200px] bg-surface border border-border rounded-xl shadow-2xl overflow-hidden z-50 py-1 text-text ring-1 ring-black/5 dark:ring-white/5">
+                                    {['KMA', 'ACCUWEATHER', 'OPENWEATHER'].map((source) => (
+                                        <div 
+                                            key={source}
+                                            className={`px-4 py-2.5 text-sm cursor-pointer transition-colors flex items-center justify-between ${apiSource === source ? 'bg-primary/20 font-bold text-primary' : 'hover:bg-surface-hover'}`}
+                                            onClick={() => {
+                                                setApiSource(source);
+                                                setIsDropdownOpen(false);
+                                            }}
+                                        >
+                                            <span>{source === 'KMA' ? '기상청 (KMA)' : source === 'ACCUWEATHER' ? 'AccuWeather' : 'OpenWeather'}</span>
+                                            {apiSource === source && <span className="material-symbols-outlined text-[18px]">check</span>}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 text-sm font-medium bg-surface-alt px-3 py-1.5 rounded-lg border border-border-light text-text">
+                            <span className="material-symbols-outlined text-[18px]">calendar_today</span>
+                            <span>{formatDate(weather?.updatedAt)}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </Card>
 
             {errorMessage && (
                 <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-600">
@@ -128,6 +161,20 @@ const Dashboard = () => {
                                 <span className="text-2xl font-medium text-text-secondary mt-2 hover:opacity-100 transition-opacity">
                                     {weather?.current.description ?? '날씨 정보 확인 중'}
                                 </span>
+                                <div className="flex flex-col gap-1.5 mt-4 text-lg font-bold">
+                                    <div className="flex items-center gap-2 text-red-400">
+                                        <div className="w-6 h-6 rounded-full bg-red-400/20 flex items-center justify-center">
+                                            <span className="material-symbols-outlined text-[16px]">arrow_upward</span>
+                                        </div>
+                                        <span>{weather ? `${round(weather.daily[0]?.maxTemp ?? weather.current.temperature)}°` : '--°'}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-blue-400">
+                                        <div className="w-6 h-6 rounded-full bg-blue-400/20 flex items-center justify-center">
+                                            <span className="material-symbols-outlined text-[16px]">arrow_downward</span>
+                                        </div>
+                                        <span>{weather ? `${round(weather.daily[0]?.minTemp ?? weather.current.temperature)}°` : '--°'}</span>
+                                    </div>
+                                </div>
                             </div>
                             <WeatherIcon condition={currentCondition} size={96} className="drop-shadow-md opacity-90 animate-pulse" />
                         </div>
