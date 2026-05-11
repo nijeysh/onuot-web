@@ -9,7 +9,7 @@
 
 ## 🟡 Medium Priority
 
-- [ ] **날씨 API 연동**: `Dashboard.tsx`의 `currentCondition` mock 상태를 실제 날씨 API 데이터로 교체
+- [x] **날씨 API 연동**: `Dashboard.tsx`의 `currentCondition` mock 상태를 실제 날씨 API 데이터로 교체
 - [ ] **SettingsPage 리팩토링**: 현재 커스텀 CSS 클래스(`settings-list`, `page-container`) 사용 중 → Tailwind 시맨틱 토큰으로 통일
 
 ## 🟢 Low Priority
