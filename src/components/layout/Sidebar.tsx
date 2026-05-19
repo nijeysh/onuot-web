@@ -23,10 +23,17 @@ const Sidebar = () => {
       <div className="flex flex-col h-full">
         {/* Logo Area */}
         <div className="h-20 flex items-center justify-center lg:justify-start lg:px-6 border-b border-border-light">
-          <div className="bg-primary/20 p-2 rounded-lg text-primary">
-            <span className="material-symbols-outlined text-[28px]">cloud</span>
-          </div>
-          <span className="ml-3 text-xl font-bold tracking-tight hidden lg:block text-text">APPS</span>
+          <button
+            type="button"
+            onClick={() => navigateTo(PAGE_TYPES.DASHBOARD)}
+            className="flex items-center rounded-lg transition-colors hover:text-primary focus:outline-none"
+            aria-label="Go to dashboard"
+          >
+            <span className="bg-primary/20 p-2 rounded-lg text-primary">
+              <span className="material-symbols-outlined text-[28px]">cloud</span>
+            </span>
+            <span className="ml-3 text-xl font-bold tracking-tight hidden lg:block text-text">APPS</span>
+          </button>
         </div>
 
         {/* User Profile (Compact) */}

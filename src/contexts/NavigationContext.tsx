@@ -3,6 +3,11 @@ import type { ReactNode } from 'react';
 import type { PageType, SettingsTab } from '../types/navigation';
 import { PAGE_TYPES, SETTINGS_TABS } from '../types/navigation';
 
+const CURRENT_PAGE_STORAGE_KEY = 'weather-app-current-page';
+const SETTINGS_TAB_STORAGE_KEY = 'weather-app-settings-tab';
+const pageTypes = Object.values(PAGE_TYPES) as PageType[];
+const settingsTabs = Object.values(SETTINGS_TABS) as SettingsTab[];
+
 interface NavigationContextType {
   currentPage: PageType;
   activeSettingsTab: SettingsTab;
@@ -12,15 +17,28 @@ interface NavigationContextType {
 
 const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
 
+const getStoredPage = (): PageType => {
+  const storedPage = window.localStorage.getItem(CURRENT_PAGE_STORAGE_KEY);
+  return pageTypes.includes(storedPage as PageType) ? storedPage as PageType : PAGE_TYPES.DASHBOARD;
+};
+
+const getStoredSettingsTab = (): SettingsTab => {
+  const storedTab = window.localStorage.getItem(SETTINGS_TAB_STORAGE_KEY);
+  return settingsTabs.includes(storedTab as SettingsTab) ? storedTab as SettingsTab : SETTINGS_TABS.GENERAL;
+};
+
 export const NavigationProvider = ({ children }: { children: ReactNode }) => {
-  const [currentPage, setCurrentPage] = useState<PageType>(PAGE_TYPES.DASHBOARD);
-  const [activeSettingsTab, setActiveSettingsTab] = useState<SettingsTab>(SETTINGS_TABS.GENERAL);
+  const [currentPage, setCurrentPage] = useState<PageType>(getStoredPage);
+  const [activeSettingsTab, setActiveSettingsTab] = useState<SettingsTab>(getStoredSettingsTab);
 
   const navigateTo = (page: PageType) => {
+    window.localStorage.setItem(CURRENT_PAGE_STORAGE_KEY, page);
     setCurrentPage(page);
   };
 
   const navigateToSettings = (tab: SettingsTab) => {
+    window.localStorage.setItem(CURRENT_PAGE_STORAGE_KEY, PAGE_TYPES.SETTINGS);
+    window.localStorage.setItem(SETTINGS_TAB_STORAGE_KEY, tab);
     setCurrentPage(PAGE_TYPES.SETTINGS);
     setActiveSettingsTab(tab);
   };
