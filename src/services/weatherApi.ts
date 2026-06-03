@@ -60,10 +60,10 @@ interface BackendWeatherData {
 }
 
 const DEFAULT_LOCATION = {
-  latitude: 37.5636,
-  longitude: 126.9976,
+  latitude: 37.5735,
+  longitude: 126.9788,
   city: '서울특별시',
-  district: '중구',
+  district: '종로구',
 };
 
 export const SEOUL_COORDS = {

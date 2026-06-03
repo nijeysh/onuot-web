@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import Card from '../common/Card';
 import WeatherIcon from '../common/WeatherIcon';
 import WeatherBackground from '../effects/WeatherBackground';
-import { getWeatherData, SEOUL_COORDS } from '../../services/weatherApi';
+import { getWeatherData } from '../../services/weatherApi';
+import { getCurrentWeatherCoordinates } from '../../services/locationService';
+import type { WeatherCoordinates } from '../../services/locationService';
 import type { WeatherData } from '../../types/weather';
 
 const formatDate = (dateText?: string) => {
@@ -28,18 +30,23 @@ const Dashboard = () => {
     const [weather, setWeather] = useState<WeatherData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [locationNotice, setLocationNotice] = useState<string | null>(null);
+    const [weatherCoordinates, setWeatherCoordinates] = useState<WeatherCoordinates | null>(null);
     const [apiSource, setApiSource] = useState('KMA');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     useEffect(() => {
         let isMounted = true;
 
-        const fetchWeather = async (latitude: number, longitude: number) => {
+        const loadWeather = async () => {
             try {
-                const data = await getWeatherData(latitude, longitude);
+                const coordinates = await getCurrentWeatherCoordinates();
+                const data = await getWeatherData(coordinates.latitude, coordinates.longitude);
                 if (!isMounted) return;
+                setWeatherCoordinates(coordinates);
                 setWeather(data);
                 setErrorMessage(null);
+                setLocationNotice(coordinates.source === 'fallback' ? coordinates.fallbackReason ?? null : null);
             } catch (error) {
                 if (!isMounted) return;
                 setErrorMessage(error instanceof Error ? error.message : '날씨 정보를 불러오지 못했습니다.');
@@ -48,18 +55,7 @@ const Dashboard = () => {
             }
         };
 
-        if (!navigator.geolocation) {
-            fetchWeather(SEOUL_COORDS.latitude, SEOUL_COORDS.longitude);
-            return () => {
-                isMounted = false;
-            };
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            ({ coords }) => fetchWeather(coords.latitude, coords.longitude),
-            () => fetchWeather(SEOUL_COORDS.latitude, SEOUL_COORDS.longitude),
-            { enableHighAccuracy: false, timeout: 5000, maximumAge: 600000 },
-        );
+        loadWeather();
 
         return () => {
             isMounted = false;
@@ -70,6 +66,7 @@ const Dashboard = () => {
     const locationLabel = weather
         ? [weather.location.city, weather.location.district].filter(Boolean).join(' ')
         : '현재 위치';
+    const locationSourceLabel = weatherCoordinates?.source === 'browser' ? '내 위치 기준' : '종로구 기준';
     const metrics = weather
         ? [
             { icon: 'thermostat', label: '체감온도', value: `${round(weather.current.feelsLike)}°C`, colorClass: 'text-blue-500', bgClass: 'bg-blue-500/10' },
@@ -136,6 +133,12 @@ const Dashboard = () => {
                 </div>
             )}
 
+            {locationNotice && !errorMessage && (
+                <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm font-medium text-amber-700 dark:text-amber-300">
+                    {locationNotice}
+                </div>
+            )}
+
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 <div className="xl:col-span-2 relative overflow-hidden rounded-2xl bg-surface-glass-2 backdrop-blur-xl border border-border-glass text-text shadow-xl group">
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-50"></div>
@@ -151,7 +154,13 @@ const Dashboard = () => {
                                     {weather ? `업데이트 ${formatUpdatedAt(weather.updatedAt)}` : '기상청 데이터를 요청하고 있습니다.'}
                                 </p>
                             </div>
-                            <div className="bg-primary text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg shadow-primary/30">Live</div>
+                            <div className="flex flex-col items-end gap-2">
+                                <div className="bg-primary text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg shadow-primary/30">Live</div>
+                                <div className="inline-flex items-center gap-1.5 rounded-full border border-border-light bg-surface-alt px-3 py-1 text-xs font-bold text-text-secondary">
+                                    <span className="material-symbols-outlined text-[15px]">my_location</span>
+                                    <span>{isLoading ? '위치 확인 중' : locationSourceLabel}</span>
+                                </div>
+                            </div>
                         </div>
                         <div className="flex flex-col md:flex-row items-end justify-between gap-6 mt-10">
                             <div className="flex flex-col">
