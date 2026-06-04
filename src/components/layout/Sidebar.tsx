@@ -1,6 +1,7 @@
 import type { PageType } from '../../types/navigation';
 import { PAGE_TYPES } from '../../types/navigation';
 import { useNavigation } from '../../contexts/NavigationContext';
+import { tokenStorage } from '../../lib/tokenStorage';
 
 interface MenuItem {
   icon: string;
@@ -11,8 +12,9 @@ interface MenuItem {
 
 const Sidebar = () => {
   const { currentPage, navigateTo } = useNavigation();
+  const isAuthenticated = Boolean(tokenStorage.getAccessToken());
   const menuItems: MenuItem[] = [
-    { icon: 'grid_view', label: 'Dashboard', page: PAGE_TYPES.DASHBOARD as PageType },
+    { icon: 'partly_cloudy_day', label: 'Weather', page: PAGE_TYPES.DASHBOARD as PageType },
     { icon: 'calendar_month', label: 'Calendar', page: PAGE_TYPES.CALENDAR as PageType },
     { icon: 'chat', label: 'Chat', page: PAGE_TYPES.CHAT as PageType },
     { icon: 'checkroom', label: 'OOTD', page: PAGE_TYPES.OOTD as PageType },
@@ -27,7 +29,7 @@ const Sidebar = () => {
             type="button"
             onClick={() => navigateTo(PAGE_TYPES.DASHBOARD)}
             className="flex items-center rounded-lg transition-colors hover:text-primary focus:outline-none"
-            aria-label="Go to dashboard"
+            aria-label="Go to weather"
           >
             <span className="bg-primary/20 p-2 rounded-lg text-primary">
               <span className="material-symbols-outlined text-[28px]">cloud</span>
@@ -36,19 +38,20 @@ const Sidebar = () => {
           </button>
         </div>
 
-        {/* User Profile (Compact) */}
-        <div className="p-4 flex flex-col items-center lg:items-start border-b border-border-light">
-          <div className="flex items-center gap-3 w-full">
-            <div
-              className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 shrink-0 ring-2 ring-surface shadow-sm"
-              style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBkrvkO03WFaE-c0oiUIwrSbt-ersICX9U_U4ioac899RuYREzEdhUH52Qks-5VWPBcYV4ejbOKIh1TBkbJSo6pFDQMXFwOkIXAv7YWcUzozQQKX6a50G7gCUAWDO9Fz4786lR4wnHAr1ZCny2WaL9IHfXemeCSjy6NmPLfjTDRMLV5RCjM2-Ni9kNn6ODcc_jV5ALv-YcFaS3ZKfCzEW-K6Og7wMuEdUgUHtarnvdsnnfO7DP61eA6i3WpdtfHQ9DzkD3yNTSOTdnk")' }}
-            ></div>
-            <div className="flex-col hidden lg:flex">
-              <h1 className="text-text text-sm font-semibold leading-tight">Sarah J.</h1>
-              <p className="text-text-secondary text-xs font-medium">San Francisco, CA</p>
+        {isAuthenticated && (
+          <div className="p-4 flex flex-col items-center lg:items-start border-b border-border-light">
+            <div className="flex items-center gap-3 w-full">
+              <div
+                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 shrink-0 ring-2 ring-surface shadow-sm"
+                style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBkrvkO03WFaE-c0oiUIwrSbt-ersICX9U_U4ioac899RuYREzEdhUH52Qks-5VWPBcYV4ejbOKIh1TBkbJSo6pFDQMXFwOkIXAv7YWcUzozQQKX6a50G7gCUAWDO9Fz4786lR4wnHAr1ZCny2WaL9IHfXemeCSjy6NmPLfjTDRMLV5RCjM2-Ni9kNn6ODcc_jV5ALv-YcFaS3ZKfCzEW-K6Og7wMuEdUgUHtarnvdsnnfO7DP61eA6i3WpdtfHQ9DzkD3yNTSOTdnk")' }}
+              ></div>
+              <div className="flex-col hidden lg:flex">
+                <h1 className="text-text text-sm font-semibold leading-tight">Sarah J.</h1>
+                <p className="text-text-secondary text-xs font-medium">San Francisco, CA</p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Navigation Links */}
         <nav className="flex-1 flex flex-col gap-2 p-3 overflow-y-auto">
