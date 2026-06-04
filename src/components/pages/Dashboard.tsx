@@ -25,6 +25,14 @@ const formatUpdatedAt = (dateText?: string) => {
 };
 
 const round = (value: number) => Math.round(value);
+const MIN_SKELETON_MS = 400;
+
+const SkeletonBlock = ({ className = '' }: { className?: string }) => (
+    <span
+        className={`block animate-pulse rounded-lg bg-text-muted/20 ${className}`}
+        aria-hidden="true"
+    />
+);
 
 const Dashboard = () => {
     const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -37,8 +45,12 @@ const Dashboard = () => {
 
     useEffect(() => {
         let isMounted = true;
+        let loadingTimer: number | undefined;
 
         const loadWeather = async () => {
+            const startedAt = Date.now();
+            setIsLoading(true);
+
             try {
                 const coordinates = await getCurrentWeatherCoordinates();
                 const data = await getWeatherData(coordinates.latitude, coordinates.longitude);
@@ -51,7 +63,11 @@ const Dashboard = () => {
                 if (!isMounted) return;
                 setErrorMessage(error instanceof Error ? error.message : '날씨 정보를 불러오지 못했습니다.');
             } finally {
-                if (isMounted) setIsLoading(false);
+                const elapsed = Date.now() - startedAt;
+                const remaining = Math.max(0, MIN_SKELETON_MS - elapsed);
+                loadingTimer = window.setTimeout(() => {
+                    if (isMounted) setIsLoading(false);
+                }, remaining);
             }
         };
 
@@ -59,6 +75,7 @@ const Dashboard = () => {
 
         return () => {
             isMounted = false;
+            if (loadingTimer) window.clearTimeout(loadingTimer);
         };
     }, []);
 
@@ -86,7 +103,7 @@ const Dashboard = () => {
             <Card variant="glass" className="mb-4 z-20 !overflow-visible">
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                     <div className="flex flex-col gap-2">
-                        <h1 className="text-3xl font-bold tracking-tight text-text-heading">Weather Dashboard</h1>
+                        <h1 className="text-3xl font-bold tracking-tight text-text-heading">Weather</h1>
                         <div className="relative">
                             <div 
                                 className="inline-flex items-center gap-2 text-sm font-medium bg-surface-alt px-3 py-1.5 rounded-lg border border-border cursor-pointer hover:bg-surface-hover transition-colors text-text shadow-sm"
@@ -149,43 +166,61 @@ const Dashboard = () => {
                                     <span className="material-symbols-outlined text-[20px] text-primary">location_on</span>
                                     <span className="text-sm font-bold tracking-wider uppercase text-text-secondary">Current Location</span>
                                 </div>
-                                <h2 className="text-4xl md:text-5xl font-black leading-tight drop-shadow-sm">{isLoading ? '불러오는 중' : locationLabel}</h2>
+                                <h2 className="flex min-h-[3.5rem] items-center text-4xl md:text-5xl font-black leading-tight drop-shadow-sm">
+                                    {isLoading ? <SkeletonBlock className="h-12 w-64 max-w-full rounded-xl" /> : locationLabel}
+                                </h2>
                                 <p className="text-lg text-text-secondary mt-2">
-                                    {weather ? `업데이트 ${formatUpdatedAt(weather.updatedAt)}` : '기상청 데이터를 요청하고 있습니다.'}
+                                    {weather ? (
+                                        `업데이트 ${formatUpdatedAt(weather.updatedAt)}`
+                                    ) : (
+                                        <SkeletonBlock className="h-5 w-56 rounded-full" />
+                                    )}
                                 </p>
                             </div>
                             <div className="flex flex-col items-end gap-2">
                                 <div className="bg-primary text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg shadow-primary/30">Live</div>
-                                <div className="inline-flex items-center gap-1.5 rounded-full border border-border-light bg-surface-alt px-3 py-1 text-xs font-bold text-text-secondary">
+                                <div className="inline-flex min-w-[7rem] items-center justify-center gap-1.5 rounded-full border border-border-light bg-surface-alt px-3 py-1 text-xs font-bold text-text-secondary">
                                     <span className="material-symbols-outlined text-[15px]">my_location</span>
-                                    <span>{isLoading ? '위치 확인 중' : locationSourceLabel}</span>
+                                    {isLoading ? <SkeletonBlock className="h-3.5 w-14 rounded-full" /> : <span>{locationSourceLabel}</span>}
                                 </div>
                             </div>
                         </div>
                         <div className="flex flex-col md:flex-row items-end justify-between gap-6 mt-10">
                             <div className="flex flex-col">
-                                <span className="text-8xl md:text-9xl font-black tracking-tighter leading-none drop-shadow-sm">
-                                    {weather ? `${round(weather.current.temperature)}°` : '--°'}
-                                </span>
-                                <span className="text-2xl font-medium text-text-secondary mt-2 hover:opacity-100 transition-opacity">
-                                    {weather?.current.description ?? '날씨 정보 확인 중'}
+                                <div className="flex h-28 md:h-32 items-end">
+                                    {isLoading ? (
+                                        <SkeletonBlock className="h-24 w-48 rounded-2xl md:h-28 md:w-56" />
+                                    ) : (
+                                        <span className="text-8xl md:text-9xl font-black tracking-tighter leading-none drop-shadow-sm">
+                                            {weather ? `${round(weather.current.temperature)}°` : '--°'}
+                                        </span>
+                                    )}
+                                </div>
+                                <span className="mt-2 flex h-8 items-center text-2xl font-medium text-text-secondary hover:opacity-100 transition-opacity">
+                                    {weather?.current.description ?? (
+                                        <SkeletonBlock className="h-7 w-40 rounded-full" />
+                                    )}
                                 </span>
                                 <div className="flex flex-col gap-1.5 mt-4 text-lg font-bold">
                                     <div className="flex items-center gap-2 text-red-400">
                                         <div className="w-6 h-6 rounded-full bg-red-400/20 flex items-center justify-center">
                                             <span className="material-symbols-outlined text-[16px]">arrow_upward</span>
                                         </div>
-                                        <span>{weather ? `${round(weather.daily[0]?.maxTemp ?? weather.current.temperature)}°` : '--°'}</span>
+                                        {isLoading ? <SkeletonBlock className="h-6 w-12 rounded-full" /> : <span>{weather ? `${round(weather.daily[0]?.maxTemp ?? weather.current.temperature)}°` : '--°'}</span>}
                                     </div>
                                     <div className="flex items-center gap-2 text-blue-400">
                                         <div className="w-6 h-6 rounded-full bg-blue-400/20 flex items-center justify-center">
                                             <span className="material-symbols-outlined text-[16px]">arrow_downward</span>
                                         </div>
-                                        <span>{weather ? `${round(weather.daily[0]?.minTemp ?? weather.current.temperature)}°` : '--°'}</span>
+                                        {isLoading ? <SkeletonBlock className="h-6 w-12 rounded-full" /> : <span>{weather ? `${round(weather.daily[0]?.minTemp ?? weather.current.temperature)}°` : '--°'}</span>}
                                     </div>
                                 </div>
                             </div>
-                            <WeatherIcon condition={currentCondition} size={96} className="drop-shadow-md opacity-90 animate-pulse" />
+                            {isLoading ? (
+                                <SkeletonBlock className="h-24 w-24 rounded-full" />
+                            ) : (
+                                <WeatherIcon condition={currentCondition} size={96} className="drop-shadow-md opacity-90 animate-pulse" />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -197,8 +232,17 @@ const Dashboard = () => {
                                 <span className={`material-symbols-outlined text-[28px] ${item.colorClass}`}>{item.icon}</span>
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-sm font-semibold uppercase tracking-wider text-text-muted mb-1">{item.label}</span>
-                                <span className="text-2xl font-bold text-text-heading">{item.value}</span>
+                                {isLoading ? (
+                                    <>
+                                        <SkeletonBlock className="mb-2 h-4 w-20 rounded-full" />
+                                        <SkeletonBlock className="h-8 w-16 rounded-full" />
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="text-sm font-semibold uppercase tracking-wider text-text-muted mb-1">{item.label}</span>
+                                        <span className="text-2xl font-bold text-text-heading">{item.value}</span>
+                                    </>
+                                )}
                             </div>
                         </Card>
                     ))}
@@ -214,7 +258,17 @@ const Dashboard = () => {
                     </button>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-7 gap-4">
-                    {(weather?.daily ?? []).slice(0, 7).map((item) => (
+                    {isLoading && Array.from({ length: 7 }, (_, index) => (
+                        <div key={index} className="flex flex-col items-center p-4 rounded-xl bg-surface-alt border border-border-light shadow-sm">
+                            <SkeletonBlock className="mb-3 h-5 w-12 rounded-full" />
+                            <SkeletonBlock className="mb-3 h-9 w-9 rounded-full" />
+                            <div className="flex flex-col items-center gap-1">
+                                <SkeletonBlock className="h-6 w-10 rounded-full" />
+                                <SkeletonBlock className="h-4 w-8 rounded-full" />
+                            </div>
+                        </div>
+                    ))}
+                    {!isLoading && (weather?.daily ?? []).slice(0, 7).map((item) => (
                         <div key={item.date} className="flex flex-col items-center p-4 rounded-xl bg-surface-alt border border-border-light hover:bg-surface-hover transition-all cursor-pointer group shadow-sm">
                             <span className="font-semibold text-text-muted mb-3">{item.dayOfWeek}</span>
                             <div className="mb-3 transform group-hover:scale-110 transition-transform">
@@ -226,7 +280,7 @@ const Dashboard = () => {
                             </div>
                         </div>
                     ))}
-                    {!weather && Array.from({ length: 5 }, (_, index) => (
+                    {!isLoading && !weather && Array.from({ length: 5 }, (_, index) => (
                         <div key={index} className="flex flex-col items-center p-4 rounded-xl bg-surface-alt border border-border-light shadow-sm">
                             <span className="font-semibold text-text-muted mb-3">--</span>
                             <WeatherIcon condition="cloudy" size={36} />
@@ -245,15 +299,23 @@ const Dashboard = () => {
                         <h3 className="text-lg font-bold text-text-heading flex items-center gap-2">
                             <span className="material-symbols-outlined text-green-500">masks</span> Air Quality
                         </h3>
-                        <span className="bg-green-500/10 text-green-600 border border-green-500/20 text-xs font-bold px-3 py-1 rounded-full shadow-inner">{weather?.current.pm10 == null ? '정보 없음' : '측정값'}</span>
+                        {isLoading ? (
+                            <SkeletonBlock className="h-6 w-16 rounded-full" />
+                        ) : (
+                            <span className="bg-green-500/10 text-green-600 border border-green-500/20 text-xs font-bold px-3 py-1 rounded-full shadow-inner">{weather?.current.pm10 == null ? '정보 없음' : '측정값'}</span>
+                        )}
                     </div>
                     <div>
                         <div className="flex justify-between items-end mb-3">
-                            <span className="text-4xl font-extrabold text-text-heading">{weather?.current.pm10 ?? '--'}</span>
+                            {isLoading ? (
+                                <SkeletonBlock className="h-11 w-20 rounded-xl" />
+                            ) : (
+                                <span className="text-4xl font-extrabold text-text-heading">{weather?.current.pm10 ?? '--'}</span>
+                            )}
                             <span className="text-text-muted text-sm font-semibold uppercase tracking-wider">PM10</span>
                         </div>
                         <div className="h-3 w-full bg-bar-bg rounded-full overflow-hidden shadow-inner border border-bar-border">
-                            <div className="h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.3)]" style={{ width: `${Math.min(weather?.current.pm10 ?? 0, 100)}%` }}></div>
+                            <div className={`h-full rounded-full ${isLoading ? 'w-2/5 animate-pulse bg-text-muted/20' : 'bg-gradient-to-r from-green-400 to-green-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]'}`} style={isLoading ? undefined : { width: `${Math.min(weather?.current.pm10 ?? 0, 100)}%` }}></div>
                         </div>
                     </div>
                 </Card>
@@ -262,15 +324,23 @@ const Dashboard = () => {
                         <h3 className="text-lg font-bold text-text-heading flex items-center gap-2">
                             <span className="material-symbols-outlined text-orange-500">wb_sunny</span> UV Index
                         </h3>
-                        <span className="bg-orange-500/10 text-orange-600 border border-orange-500/20 text-xs font-bold px-3 py-1 rounded-full shadow-inner">{weather?.current.uvIndex == null ? '정보 없음' : '측정값'}</span>
+                        {isLoading ? (
+                            <SkeletonBlock className="h-6 w-16 rounded-full" />
+                        ) : (
+                            <span className="bg-orange-500/10 text-orange-600 border border-orange-500/20 text-xs font-bold px-3 py-1 rounded-full shadow-inner">{weather?.current.uvIndex == null ? '정보 없음' : '측정값'}</span>
+                        )}
                     </div>
                     <div>
                         <div className="flex justify-between items-end mb-3">
-                            <span className="text-4xl font-extrabold text-text-heading">{weather?.current.uvIndex ?? '--'}</span>
+                            {isLoading ? (
+                                <SkeletonBlock className="h-11 w-20 rounded-xl" />
+                            ) : (
+                                <span className="text-4xl font-extrabold text-text-heading">{weather?.current.uvIndex ?? '--'}</span>
+                            )}
                             <span className="text-text-muted text-sm font-semibold uppercase tracking-wider">UV</span>
                         </div>
                         <div className="h-3 w-full bg-bar-bg rounded-full overflow-hidden shadow-inner border border-bar-border">
-                            <div className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.3)]" style={{ width: `${Math.min((weather?.current.uvIndex ?? 0) * 10, 100)}%` }}></div>
+                            <div className={`h-full rounded-full ${isLoading ? 'w-2/5 animate-pulse bg-text-muted/20' : 'bg-gradient-to-r from-yellow-400 to-orange-500 shadow-[0_0_10px_rgba(245,158,11,0.3)]'}`} style={isLoading ? undefined : { width: `${Math.min((weather?.current.uvIndex ?? 0) * 10, 100)}%` }}></div>
                         </div>
                     </div>
                 </Card>
