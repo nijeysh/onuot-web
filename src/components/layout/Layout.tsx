@@ -1,22 +1,18 @@
 import { useEffect, useRef } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { useNavigation } from '../../contexts/NavigationContext';
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-const Layout = ({ children }: LayoutProps) => {
-  const { currentPage } = useNavigation();
+const Layout = () => {
+  const { pathname } = useLocation();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const isDashboard = currentPage === 'dashboard';
+  const isDashboard = pathname === '/';
 
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    const storageKey = `weather-app-scroll-${currentPage}`;
+    const storageKey = `weather-app-scroll-${pathname}`;
     const storedScrollTop = Number(window.sessionStorage.getItem(storageKey) ?? 0);
 
     const restoreScroll = () => {
@@ -31,12 +27,12 @@ const Layout = ({ children }: LayoutProps) => {
       window.cancelAnimationFrame(frameId);
       window.clearTimeout(timeoutId);
     };
-  }, [currentPage]);
+  }, [pathname]);
 
   const handleScroll = () => {
     const container = scrollContainerRef.current;
     if (!container) return;
-    window.sessionStorage.setItem(`weather-app-scroll-${currentPage}`, String(container.scrollTop));
+    window.sessionStorage.setItem(`weather-app-scroll-${pathname}`, String(container.scrollTop));
   };
 
   return (
@@ -50,7 +46,7 @@ const Layout = ({ children }: LayoutProps) => {
           className="flex-1 overflow-y-auto px-6 lg:px-10 pb-10"
         >
           <div className="max-w-7xl mx-auto">
-            {children}
+            <Outlet />
           </div>
         </div>
       </main>

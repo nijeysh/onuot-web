@@ -1,5 +1,6 @@
 export const PAGE_TYPES = {
   DASHBOARD: 'dashboard',
+  LOGIN: 'login',
   CALENDAR: 'calendar',
   CHAT: 'chat',
   OOTD: 'ootd',

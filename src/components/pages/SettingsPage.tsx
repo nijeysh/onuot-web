@@ -1,10 +1,30 @@
 import { Bell, Lock, User, Globe } from 'lucide-react';
+import { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import type { SettingsTab } from '../../types/navigation';
 import { SETTINGS_TABS } from '../../types/navigation';
-import { useNavigation } from '../../contexts/NavigationContext';
 import { GeneralTab, AccountTab, NotificationsTab, PrivacyTab } from './settings';
 
+const settingsTabs = Object.values(SETTINGS_TABS) as SettingsTab[];
+
+const isSettingsTab = (value: string | undefined): value is SettingsTab => {
+  return settingsTabs.includes(value as SettingsTab);
+};
+
 const SettingsPage = () => {
-  const { activeSettingsTab: activeTab, navigateToSettings: onTabChange } = useNavigation();
+  const { tab } = useParams();
+  const navigate = useNavigate();
+  const activeTab = isSettingsTab(tab) ? tab : SETTINGS_TABS.GENERAL;
+
+  useEffect(() => {
+    if (!isSettingsTab(tab)) {
+      navigate(`/settings/${SETTINGS_TABS.GENERAL}`, { replace: true });
+    }
+  }, [navigate, tab]);
+
+  const onTabChange = (nextTab: SettingsTab) => {
+    navigate(`/settings/${nextTab}`);
+  };
 
   const menuItems = [
     { id: SETTINGS_TABS.GENERAL, label: 'General', icon: Globe, desc: 'Language, theme, units' },

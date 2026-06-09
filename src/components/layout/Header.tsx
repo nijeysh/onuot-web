@@ -1,13 +1,15 @@
+import { useNavigate } from 'react-router-dom';
 import ThemeToggle from '../common/ThemeToggle';
 import ProfileDropdown from './ProfileDropdown';
 import { tokenStorage } from '../../lib/tokenStorage';
 
 const Header = () => {
+  const navigate = useNavigate();
   const isAuthenticated = Boolean(tokenStorage.getAccessToken());
 
   return (
     <header className="h-20 shrink-0 px-6 lg:px-10 flex items-center justify-between bg-surface/80 backdrop-blur-md z-30 sticky top-0 border-b border-border-light">
-      <div className="flex-1 max-w-xl">
+      <div className="hidden md:block flex-1 max-w-xl">
         <div className="relative group">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <span className="material-symbols-outlined text-text-muted">search</span>
@@ -27,6 +29,17 @@ const Header = () => {
 
       <div className="flex items-center gap-4 ml-6">
         <ThemeToggle />
+
+        {!isAuthenticated && (
+          <button
+            type="button"
+            onClick={() => navigate('/login')}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/40"
+          >
+            <span className="material-symbols-outlined text-[20px]">login</span>
+            <span className="hidden sm:inline">Sign in</span>
+          </button>
+        )}
 
         {isAuthenticated && (
           <button className="relative p-2 text-text-secondary hover:bg-surface-hover hover:text-primary rounded-full transition-colors">

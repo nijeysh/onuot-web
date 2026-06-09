@@ -1,43 +1,23 @@
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './components/layout/Layout';
-import { Dashboard, CalendarPage, ChatPage, OOTDPage, SettingsPage } from './components/pages';
-import { PAGE_TYPES } from './types/navigation';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { NavigationProvider, useNavigation } from './contexts/NavigationContext';
-
-function AppContent() {
-  const { currentPage } = useNavigation();
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case PAGE_TYPES.DASHBOARD:
-        return <Dashboard />;
-      case PAGE_TYPES.CALENDAR:
-        return <CalendarPage />;
-      case PAGE_TYPES.CHAT:
-        return <ChatPage />;
-      case PAGE_TYPES.OOTD:
-        return <OOTDPage />;
-      case PAGE_TYPES.SETTINGS:
-        return <SettingsPage />;
-      default:
-        return <Dashboard />;
-    }
-  };
-
-  return (
-    <Layout>
-      {renderPage()}
-    </Layout>
-  );
-}
+import { Dashboard, CalendarPage, ChatPage, OOTDPage, SettingsPage, LoginPage } from './components/pages';
 
 function App() {
   return (
-    <ThemeProvider>
-      <NavigationProvider>
-        <AppContent />
-      </NavigationProvider>
-    </ThemeProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="login" element={<LoginPage />} />
+          <Route path="calendar" element={<CalendarPage />} />
+          <Route path="chat" element={<ChatPage />} />
+          <Route path="ootd" element={<OOTDPage />} />
+          <Route path="settings" element={<Navigate to="/settings/general" replace />} />
+          <Route path="settings/:tab" element={<SettingsPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

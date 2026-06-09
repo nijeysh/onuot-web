@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { SettingsTab } from '../../types/navigation';
-import { useNavigation } from '../../contexts/NavigationContext';
 
 const ProfileDropdown = () => {
-  const { navigateToSettings } = useNavigation();
+  const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -18,7 +18,7 @@ const ProfileDropdown = () => {
   }, []);
 
   const handleSettingsClick = (tab: SettingsTab) => {
-    navigateToSettings(tab);
+    navigate(`/settings/${tab}`);
     setIsProfileOpen(false);
   };
 

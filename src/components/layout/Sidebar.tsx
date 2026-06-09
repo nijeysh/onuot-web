@@ -1,23 +1,20 @@
-import type { PageType } from '../../types/navigation';
-import { PAGE_TYPES } from '../../types/navigation';
-import { useNavigation } from '../../contexts/NavigationContext';
+import { Link, NavLink } from 'react-router-dom';
 import { tokenStorage } from '../../lib/tokenStorage';
 
 interface MenuItem {
   icon: string;
   label: string;
-  page: PageType;
+  path: string;
   badge?: number;
 }
 
 const Sidebar = () => {
-  const { currentPage, navigateTo } = useNavigation();
   const isAuthenticated = Boolean(tokenStorage.getAccessToken());
   const menuItems: MenuItem[] = [
-    { icon: 'partly_cloudy_day', label: 'Weather', page: PAGE_TYPES.DASHBOARD as PageType },
-    { icon: 'calendar_month', label: 'Calendar', page: PAGE_TYPES.CALENDAR as PageType },
-    { icon: 'chat', label: 'Chat', page: PAGE_TYPES.CHAT as PageType },
-    { icon: 'checkroom', label: 'OOTD', page: PAGE_TYPES.OOTD as PageType },
+    { icon: 'partly_cloudy_day', label: 'Weather', path: '/' },
+    { icon: 'calendar_month', label: 'Calendar', path: '/calendar' },
+    { icon: 'chat', label: 'Chat', path: '/chat' },
+    { icon: 'checkroom', label: 'OOTD', path: '/ootd' },
   ];
 
   return (
@@ -25,9 +22,8 @@ const Sidebar = () => {
       <div className="flex flex-col h-full">
         {/* Logo Area */}
         <div className="h-20 flex items-center justify-center lg:justify-start lg:px-6 border-b border-border-light">
-          <button
-            type="button"
-            onClick={() => navigateTo(PAGE_TYPES.DASHBOARD)}
+          <Link
+            to="/"
             className="flex items-center rounded-lg transition-colors hover:text-primary focus:outline-none"
             aria-label="Go to weather"
           >
@@ -35,7 +31,7 @@ const Sidebar = () => {
               <span className="material-symbols-outlined text-[28px]">cloud</span>
             </span>
             <span className="ml-3 text-xl font-bold tracking-tight hidden lg:block text-text">APPS</span>
-          </button>
+          </Link>
         </div>
 
         {isAuthenticated && (
@@ -56,26 +52,31 @@ const Sidebar = () => {
         {/* Navigation Links */}
         <nav className="flex-1 flex flex-col gap-2 p-3 overflow-y-auto">
           {menuItems.map((item) => (
-            <button
-              key={item.page}
-              onClick={() => navigateTo(item.page)}
-              className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors group ${currentPage === item.page
+            <NavLink
+              key={item.path}
+              to={item.path}
+              end={item.path === '/'}
+              className={({ isActive }) => `flex items-center gap-3 px-3 py-3 rounded-lg transition-colors group ${isActive
                 ? 'bg-primary/10 text-primary'
                 : 'text-text-secondary hover:bg-surface-hover hover:text-text'
                 }`}
             >
-              <span className={`material-symbols-outlined text-[24px] ${currentPage === item.page ? 'fill-current' : ''}`}>
+              {({ isActive }) => (
+                <>
+                  <span className={`material-symbols-outlined text-[24px] ${isActive ? 'fill-current' : ''}`}>
                 {item.icon}
-              </span>
-              <span className={`text-sm hidden lg:block ${currentPage === item.page ? 'font-semibold' : 'font-medium'}`}>
-                {item.label}
-              </span>
-              {item.badge && (
-                <span className="ml-auto bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden lg:block">
-                  {item.badge}
-                </span>
+                  </span>
+                  <span className={`text-sm hidden lg:block ${isActive ? 'font-semibold' : 'font-medium'}`}>
+                    {item.label}
+                  </span>
+                  {item.badge && (
+                    <span className="ml-auto bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden lg:block">
+                      {item.badge}
+                    </span>
+                  )}
+                </>
               )}
-            </button>
+            </NavLink>
           ))}
         </nav>
       </div>
