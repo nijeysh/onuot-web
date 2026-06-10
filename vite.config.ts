@@ -16,6 +16,10 @@ export default defineConfig({
         target: API_TARGET,
         changeOrigin: true,
       },
+      '/oauth': {
+        target: API_TARGET,
+        changeOrigin: true,
+      },
     },
   },
 })
