@@ -1,6 +1,5 @@
 import type { IconType } from 'react-icons';
 import { FcGoogle } from 'react-icons/fc';
-import { SiKakaotalk, SiNaver } from 'react-icons/si';
 
 interface OAuthProvider {
   name: string;
@@ -17,20 +16,6 @@ const providers: OAuthProvider[] = [
     href: '/oauth/google',
     Icon: FcGoogle,
     className: 'border-border bg-surface text-text hover:bg-surface-hover',
-  },
-  {
-    name: 'naver',
-    label: 'Continue with Naver',
-    href: '/oauth/naver',
-    Icon: SiNaver,
-    className: 'border-[#03c75a] bg-[#03c75a] text-white hover:bg-[#02b351]',
-  },
-  {
-    name: 'kakao',
-    label: 'Continue with Kakao',
-    href: '/oauth/kakao',
-    Icon: SiKakaotalk,
-    className: 'border-[#fee500] bg-[#fee500] text-[#181600] hover:bg-[#f4dc00]',
   },
 ];
 

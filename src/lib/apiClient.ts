@@ -2,6 +2,17 @@ import axios from 'axios';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { tokenStorage } from './tokenStorage';
 
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  code?: string;
+  message?: string;
+}
+
+interface AccessTokenResponse {
+  accessToken: string;
+}
+
 // ────────────────────────────────────────────
 // 1. Axios 인스턴스 생성
 // ────────────────────────────────────────────
@@ -83,9 +94,9 @@ apiClient.interceptors.response.use(
       try {
         // Spring 토큰 재발급 엔드포인트 호출
         // Refresh Token은 HttpOnly Cookie로 자동 전송 (withCredentials: true)
-        const { data } = await axios.post('/api/auth/refresh', {}, { withCredentials: true });
+        const { data } = await axios.post<ApiResponse<AccessTokenResponse>>('/api/auth/refresh', {}, { withCredentials: true });
 
-        const newAccessToken: string = data.accessToken;
+        const newAccessToken = data.data.accessToken;
         tokenStorage.setAccessToken(newAccessToken);
         onRefreshed(newAccessToken);
 
