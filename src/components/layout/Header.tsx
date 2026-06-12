@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import ThemeToggle from '../common/ThemeToggle';
 import ProfileDropdown from './ProfileDropdown';
-import { tokenStorage } from '../../lib/tokenStorage';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Header = () => {
   const navigate = useNavigate();
-  const isAuthenticated = Boolean(tokenStorage.getAccessToken());
+  const { isAuthenticated } = useAuth();
 
   return (
     <header className="h-20 shrink-0 px-6 lg:px-10 flex items-center justify-between bg-surface/80 backdrop-blur-md z-30 sticky top-0 border-b border-border-light">

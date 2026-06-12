@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import Layout from './components/layout/Layout';
 import { Dashboard, CalendarPage, ChatPage, OOTDPage, SettingsPage, LoginPage, AuthCallbackPage } from './components/pages';
 
@@ -10,11 +11,11 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="auth/callback" element={<AuthCallbackPage />} />
-          <Route path="calendar" element={<CalendarPage />} />
-          <Route path="chat" element={<ChatPage />} />
-          <Route path="ootd" element={<OOTDPage />} />
-          <Route path="settings" element={<Navigate to="/settings/general" replace />} />
-          <Route path="settings/:tab" element={<SettingsPage />} />
+          <Route path="calendar" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
+          <Route path="chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+          <Route path="ootd" element={<ProtectedRoute><OOTDPage /></ProtectedRoute>} />
+          <Route path="settings" element={<ProtectedRoute><Navigate to="/settings/general" replace /></ProtectedRoute>} />
+          <Route path="settings/:tab" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

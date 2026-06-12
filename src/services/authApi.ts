@@ -6,6 +6,13 @@
 import apiClient from '../lib/apiClient';
 import { tokenStorage } from '../lib/tokenStorage';
 
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  code?: string;
+  message?: string;
+}
+
 interface LoginRequest {
   email: string;
   password: string;
@@ -18,8 +25,8 @@ interface LoginResponse {
 
 /** 로그인 */
 export const login = async (credentials: LoginRequest): Promise<void> => {
-  const { data } = await apiClient.post<LoginResponse>('/auth/login', credentials);
-  tokenStorage.setAccessToken(data.accessToken);
+  const { data } = await apiClient.post<ApiResponse<LoginResponse>>('/auth/login', credentials);
+  tokenStorage.setAccessToken(data.data.accessToken);
 };
 
 /** 로그아웃 */
@@ -30,6 +37,6 @@ export const logout = async (): Promise<void> => {
 
 /** 내 정보 조회 예시 */
 export const getMyProfile = async () => {
-  const { data } = await apiClient.get('/users/me');
+  const { data } = await apiClient.get('/members/me');
   return data;
 };

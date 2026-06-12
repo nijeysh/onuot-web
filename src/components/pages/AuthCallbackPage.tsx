@@ -1,38 +1,26 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { tokenStorage } from '../../lib/tokenStorage';
-
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  code?: string;
-  message?: string;
-}
-
-interface AccessTokenResponse {
-  accessToken: string;
-}
+import { useAuth } from '../../contexts/AuthContext';
 
 const AuthCallbackPage = () => {
   const navigate = useNavigate();
+  const { refreshSession } = useAuth();
   const [message, setMessage] = useState('Completing sign in...');
 
   useEffect(() => {
     const completeSignIn = async () => {
-      try {
-        const { data } = await axios.post<ApiResponse<AccessTokenResponse>>('/api/auth/refresh', {}, { withCredentials: true });
-        tokenStorage.setAccessToken(data.data.accessToken);
+      const refreshed = await refreshSession();
+      if (refreshed) {
         navigate('/', { replace: true });
-      } catch {
-        tokenStorage.clearAccessToken();
-        setMessage('Sign in failed. Please try again.');
-        window.setTimeout(() => navigate('/login', { replace: true }), 1200);
+        return;
       }
+
+      setMessage('Sign in failed. Please try again.');
+      window.setTimeout(() => navigate('/login', { replace: true }), 1200);
     };
 
     void completeSignIn();
-  }, [navigate]);
+  }, [navigate, refreshSession]);
 
   return (
     <section className="flex min-h-[calc(100vh-8rem)] items-center justify-center py-10">
