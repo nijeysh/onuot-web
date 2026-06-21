@@ -29,6 +29,7 @@ interface AuthContextValue {
   member: AuthMember | null;
   isAuthenticated: boolean;
   refreshSession: () => Promise<boolean>;
+  devLogin: () => Promise<boolean>;
   logout: () => Promise<void>;
 }
 
@@ -38,14 +39,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [status, setStatus] = useState<AuthStatus>('loading');
   const [member, setMember] = useState<AuthMember | null>(null);
 
+  const authenticate = useCallback(async (accessToken: string) => {
+    tokenStorage.setAccessToken(accessToken);
+
+    const profileResponse = await apiClient.get<ApiResponse<AuthMember>>('/members/me');
+    setMember(profileResponse.data.data);
+    setStatus('authenticated');
+  }, []);
+
   const refreshSession = useCallback(async () => {
     try {
       const tokenResponse = await axios.post<ApiResponse<AccessTokenResponse>>('/api/auth/refresh', {}, { withCredentials: true });
-      tokenStorage.setAccessToken(tokenResponse.data.data.accessToken);
-
-      const profileResponse = await apiClient.get<ApiResponse<AuthMember>>('/members/me');
-      setMember(profileResponse.data.data);
-      setStatus('authenticated');
+      await authenticate(tokenResponse.data.data.accessToken);
       return true;
     } catch {
       tokenStorage.clearAccessToken();
@@ -53,7 +58,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setStatus('anonymous');
       return false;
     }
-  }, []);
+  }, [authenticate]);
+
+  const devLogin = useCallback(async () => {
+    if (!import.meta.env.DEV) {
+      return false;
+    }
+
+    try {
+      const tokenResponse = await axios.post<ApiResponse<AccessTokenResponse>>('/api/dev/auth/login', {}, { withCredentials: true });
+      await authenticate(tokenResponse.data.data.accessToken);
+      return true;
+    } catch {
+      tokenStorage.clearAccessToken();
+      setMember(null);
+      setStatus('anonymous');
+      return false;
+    }
+  }, [authenticate]);
 
   const logout = useCallback(async () => {
     try {
@@ -74,8 +96,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     member,
     isAuthenticated: status === 'authenticated',
     refreshSession,
+    devLogin,
     logout,
-  }), [logout, member, refreshSession, status]);
+  }), [devLogin, logout, member, refreshSession, status]);
 
   return (
     <AuthContext.Provider value={value}>

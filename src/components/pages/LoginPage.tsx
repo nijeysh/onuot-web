@@ -1,5 +1,9 @@
+import { useState } from 'react';
+import { FlaskConical } from 'lucide-react';
 import type { IconType } from 'react-icons';
 import { FcGoogle } from 'react-icons/fc';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface OAuthProvider {
   name: string;
@@ -20,6 +24,27 @@ const providers: OAuthProvider[] = [
 ];
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { devLogin } = useAuth();
+  const [isDevLoginPending, setIsDevLoginPending] = useState(false);
+  const [devLoginError, setDevLoginError] = useState<string | null>(null);
+
+  const handleDevLogin = async () => {
+    setIsDevLoginPending(true);
+    setDevLoginError(null);
+
+    const isLoggedIn = await devLogin();
+    if (isLoggedIn) {
+      const from = (location.state as { from?: string } | null)?.from ?? '/';
+      navigate(from, { replace: true });
+      return;
+    }
+
+    setDevLoginError('Test sign-in failed. Check the API server.');
+    setIsDevLoginPending(false);
+  };
+
   return (
     <section className="min-h-[calc(100vh-8rem)] py-8 lg:py-12">
       <div className="mx-auto grid w-full max-w-5xl overflow-hidden rounded-lg border border-border bg-surface shadow-[0_24px_80px_-48px_rgba(15,23,42,0.45)] lg:grid-cols-[1.1fr_0.9fr]">
@@ -66,7 +91,25 @@ const LoginPage = () => {
                   <span>{label}</span>
                 </a>
               ))}
+
+              {import.meta.env.DEV && (
+                <button
+                  type="button"
+                  onClick={() => void handleDevLogin()}
+                  disabled={isDevLoginPending}
+                  className="flex h-12 items-center justify-center gap-3 rounded-lg border border-dashed border-border bg-surface-alt px-4 text-sm font-semibold text-text transition-colors hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:cursor-wait disabled:opacity-60"
+                >
+                  <FlaskConical className="size-5 shrink-0 text-primary" aria-hidden="true" />
+                  <span>{isDevLoginPending ? 'Signing in...' : 'Continue as Test User'}</span>
+                </button>
+              )}
             </div>
+
+            {devLoginError && (
+              <p role="alert" className="mt-3 text-sm text-red-600">
+                {devLoginError}
+              </p>
+            )}
 
             <div className="mt-8 rounded-lg border border-border bg-surface-alt p-4">
               <div className="flex gap-3">
