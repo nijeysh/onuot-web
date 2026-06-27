@@ -1,34 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FlaskConical } from 'lucide-react';
-import type { IconType } from 'react-icons';
-import { FcGoogle } from 'react-icons/fc';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-
-interface OAuthProvider {
-  name: string;
-  label: string;
-  href: string;
-  Icon: IconType;
-  className: string;
-}
-
-const providers: OAuthProvider[] = [
-  {
-    name: 'google',
-    label: 'Continue with Google',
-    href: '/oauth/google',
-    Icon: FcGoogle,
-    className: 'border-border bg-surface text-text hover:bg-surface-hover',
-  },
-];
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { devLogin } = useAuth();
+  const { devLogin, isAuthenticated, status } = useAuth();
   const [isDevLoginPending, setIsDevLoginPending] = useState(false);
   const [devLoginError, setDevLoginError] = useState<string | null>(null);
+
+  const from = (location.state as { from?: string } | null)?.from ?? '/';
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(from, { replace: true });
+    }
+  }, [from, isAuthenticated, navigate]);
 
   const handleDevLogin = async () => {
     setIsDevLoginPending(true);
@@ -36,14 +24,15 @@ const LoginPage = () => {
 
     const isLoggedIn = await devLogin();
     if (isLoggedIn) {
-      const from = (location.state as { from?: string } | null)?.from ?? '/';
       navigate(from, { replace: true });
       return;
     }
 
-    setDevLoginError('Test sign-in failed. Check the API server.');
+    setDevLoginError('Test user sign-in failed. Check the API server.');
     setIsDevLoginPending(false);
   };
+
+  const isLoading = status === 'loading' || isDevLoginPending;
 
   return (
     <section className="min-h-[calc(100vh-8rem)] py-8 lg:py-12">
@@ -60,12 +49,12 @@ const LoginPage = () => {
             </div>
 
             <div className="max-w-md">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">OAuth Sign In</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">Development Access</p>
               <h1 className="mt-3 text-3xl font-bold leading-tight lg:text-5xl">
-                One account, all weather moments.
+                Keep building with the test user.
               </h1>
               <p className="mt-4 text-sm leading-6 text-white/78 lg:text-base">
-                Start with your social account and keep your calendar, chat, and OOTD flow together.
+                The local app signs in as Test User so product screens stay available while login is paused.
               </p>
             </div>
           </div>
@@ -74,34 +63,27 @@ const LoginPage = () => {
         <div className="flex items-center bg-surface p-6 sm:p-8 lg:p-10">
           <div className="w-full">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-text">Sign in</h2>
+              <h2 className="text-2xl font-bold text-text">Test user mode</h2>
               <p className="mt-2 text-sm leading-6 text-text-secondary">
-                New users are created automatically on first social login.
+                Local development uses test@onuot.local until the real login flow is ready.
               </p>
             </div>
 
             <div className="flex flex-col gap-3">
-              {providers.map(({ name, label, href, Icon, className }) => (
-                <a
-                  key={name}
-                  href={href}
-                  className={`flex h-12 items-center justify-center gap-3 rounded-lg border px-4 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 ${className}`}
-                >
-                  <Icon className="size-5 shrink-0" />
-                  <span>{label}</span>
-                </a>
-              ))}
-
-              {import.meta.env.DEV && (
+              {import.meta.env.DEV ? (
                 <button
                   type="button"
                   onClick={() => void handleDevLogin()}
-                  disabled={isDevLoginPending}
+                  disabled={isLoading}
                   className="flex h-12 items-center justify-center gap-3 rounded-lg border border-dashed border-border bg-surface-alt px-4 text-sm font-semibold text-text transition-colors hover:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:cursor-wait disabled:opacity-60"
                 >
                   <FlaskConical className="size-5 shrink-0 text-primary" aria-hidden="true" />
-                  <span>{isDevLoginPending ? 'Signing in...' : 'Continue as Test User'}</span>
+                  <span>{isLoading ? 'Signing in...' : 'Continue as Test User'}</span>
                 </button>
+              ) : (
+                <div className="rounded-lg border border-border bg-surface-alt p-4 text-sm leading-6 text-text-secondary">
+                  Login is paused while the product screens are being built.
+                </div>
               )}
             </div>
 
@@ -115,7 +97,7 @@ const LoginPage = () => {
               <div className="flex gap-3">
                 <span className="material-symbols-outlined text-[22px] text-primary">verified_user</span>
                 <p className="text-sm leading-6 text-text-secondary">
-                  No password is stored by APPS. Authentication is handled by the selected provider.
+                  This temporary flow is only for local development and can be replaced later.
                 </p>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import apiClient from '../lib/apiClient';
 import { tokenStorage } from '../lib/tokenStorage';
@@ -35,9 +35,12 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+const getDevLoginPath = () => ['/api', '/dev', '/auth', '/login'].join('');
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [status, setStatus] = useState<AuthStatus>('loading');
   const [member, setMember] = useState<AuthMember | null>(null);
+  const sessionRequestRef = useRef<Promise<boolean> | null>(null);
 
   const authenticate = useCallback(async (accessToken: string) => {
     tokenStorage.setAccessToken(accessToken);
@@ -47,26 +50,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setStatus('authenticated');
   }, []);
 
-  const refreshSession = useCallback(async () => {
-    try {
-      const tokenResponse = await axios.post<ApiResponse<AccessTokenResponse>>('/api/auth/refresh', {}, { withCredentials: true });
-      await authenticate(tokenResponse.data.data.accessToken);
-      return true;
-    } catch {
-      tokenStorage.clearAccessToken();
-      setMember(null);
-      setStatus('anonymous');
-      return false;
-    }
-  }, [authenticate]);
-
   const devLogin = useCallback(async () => {
     if (!import.meta.env.DEV) {
       return false;
     }
 
     try {
-      const tokenResponse = await axios.post<ApiResponse<AccessTokenResponse>>('/api/dev/auth/login', {}, { withCredentials: true });
+      const tokenResponse = await axios.post<ApiResponse<AccessTokenResponse>>(getDevLoginPath(), {}, { withCredentials: true });
       await authenticate(tokenResponse.data.data.accessToken);
       return true;
     } catch {
@@ -76,6 +66,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return false;
     }
   }, [authenticate]);
+
+  const refreshSession = useCallback(() => {
+    if (sessionRequestRef.current) {
+      return sessionRequestRef.current;
+    }
+
+    const sessionRequest = (async () => {
+      try {
+        const tokenResponse = await axios.post<ApiResponse<AccessTokenResponse>>('/api/auth/refresh', {}, { withCredentials: true });
+        await authenticate(tokenResponse.data.data.accessToken);
+        return true;
+      } catch {
+        if (import.meta.env.DEV) {
+          return devLogin();
+        }
+
+        tokenStorage.clearAccessToken();
+        setMember(null);
+        setStatus('anonymous');
+        return false;
+      }
+    })();
+
+    sessionRequestRef.current = sessionRequest;
+    void sessionRequest.finally(() => {
+      if (sessionRequestRef.current === sessionRequest) {
+        sessionRequestRef.current = null;
+      }
+    });
+
+    return sessionRequest;
+  }, [authenticate, devLogin]);
 
   const logout = useCallback(async () => {
     try {
