@@ -1,4 +1,4 @@
-// 날씨 상태 타입
+﻿// 날씨 상태 타입
 export type WeatherCondition =
   | 'sunny'
   | 'partly_cloudy'
@@ -15,6 +15,7 @@ export interface CurrentWeather {
   feelsLike: number;          // 체감 온도 (°C)
   humidity: number;           // 습도 (%)
   windSpeed: number;          // 풍속 (m/s)
+  precipitation: number;      // 강수량 (mm)
   condition: WeatherCondition;
   description: string;        // 날씨 설명
   pm10?: number | null;       // 미세먼지 (μg/m³)
@@ -82,3 +83,5 @@ export const getAirQualityLabel = (grade: AirQualityGrade): string => {
   };
   return labels[grade];
 };
+
+

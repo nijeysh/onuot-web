@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import Card from '../common/Card';
 import WeatherIcon from '../common/WeatherIcon';
 import WeatherBackground from '../effects/WeatherBackground';
 import { getWeatherData } from '../../services/weatherApi';
+import { getTodayOutfitRecommendation } from '../../services/outfitApi';
 import { getCurrentWeatherCoordinates } from '../../services/locationService';
 import type { WeatherCoordinates } from '../../services/locationService';
 import type { WeatherData } from '../../types/weather';
+import type { OutfitRecommendation, OutfitRecommendationRequest } from '../../types/outfit';
 
 const formatDate = (dateText?: string) => {
     const date = dateText ? new Date(dateText) : new Date();
@@ -34,9 +36,23 @@ const SkeletonBlock = ({ className = '' }: { className?: string }) => (
     />
 );
 
+const buildOutfitRecommendationRequest = (weather: WeatherData): OutfitRecommendationRequest => ({
+    temperature: weather.current.temperature,
+    feelsLike: weather.current.feelsLike,
+    humidity: weather.current.humidity,
+    windSpeed: weather.current.windSpeed,
+    precipitation: weather.current.precipitation,
+    precipitationProbability: weather.daily[0]?.precipProbability,
+    uvIndex: weather.current.uvIndex,
+    condition: weather.current.condition,
+});
+
 const Dashboard = () => {
     const [weather, setWeather] = useState<WeatherData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [outfitRecommendation, setOutfitRecommendation] = useState<OutfitRecommendation | null>(null);
+    const [isRecommendationLoading, setIsRecommendationLoading] = useState(false);
+    const [recommendationErrorMessage, setRecommendationErrorMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [locationNotice, setLocationNotice] = useState<string | null>(null);
     const [weatherCoordinates, setWeatherCoordinates] = useState<WeatherCoordinates | null>(null);
@@ -50,6 +66,8 @@ const Dashboard = () => {
         const loadWeather = async () => {
             const startedAt = Date.now();
             setIsLoading(true);
+            setOutfitRecommendation(null);
+            setRecommendationErrorMessage(null);
 
             try {
                 const coordinates = await getCurrentWeatherCoordinates();
@@ -79,6 +97,39 @@ const Dashboard = () => {
         };
     }, []);
 
+    useEffect(() => {
+        if (!weather) {
+            setOutfitRecommendation(null);
+            setIsRecommendationLoading(false);
+            return;
+        }
+
+        let isMounted = true;
+
+        const loadRecommendation = async () => {
+            setIsRecommendationLoading(true);
+            setRecommendationErrorMessage(null);
+
+            try {
+                const recommendation = await getTodayOutfitRecommendation(buildOutfitRecommendationRequest(weather));
+                if (!isMounted) return;
+                setOutfitRecommendation(recommendation);
+            } catch (error) {
+                if (!isMounted) return;
+                setOutfitRecommendation(null);
+                setRecommendationErrorMessage(error instanceof Error ? error.message : '추천 정보를 불러오지 못했습니다.');
+            } finally {
+                if (isMounted) setIsRecommendationLoading(false);
+            }
+        };
+
+        loadRecommendation();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [weather]);
+
     const currentCondition = weather?.current.condition ?? 'cloudy';
     const locationLabel = weather
         ? [weather.location.city, weather.location.district].filter(Boolean).join(' ')
@@ -95,6 +146,7 @@ const Dashboard = () => {
             { icon: 'humidity_percentage', label: '습도', value: '--%', colorClass: 'text-indigo-500', bgClass: 'bg-indigo-500/10' },
             { icon: 'air', label: '바람', value: '-- m/s', colorClass: 'text-cyan-500', bgClass: 'bg-cyan-500/10' },
         ];
+    const isRecommendationPending = isLoading || isRecommendationLoading;
 
     return (
         <div className="flex flex-col gap-6 pt-4 relative">
@@ -249,6 +301,87 @@ const Dashboard = () => {
                 </div>
             </div>
 
+            <Card variant="glass" className="gap-5">
+                <div className="flex flex-col gap-3 border-b border-border-light pb-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h3 className="flex items-center gap-2 text-xl font-bold text-text-heading">
+                            <span className="material-symbols-outlined text-primary">checkroom</span>
+                            Today's Recommendation
+                        </h3>
+                        <p className="mt-1 text-sm font-medium text-text-secondary">현재 날씨 기준 옷차림과 행동요령</p>
+                    </div>
+                    <span className="inline-flex w-fit items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                        <span className="material-symbols-outlined text-[15px]">rule</span>
+                        Rule-based
+                    </span>
+                </div>
+
+                {isRecommendationPending ? (
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {Array.from({ length: 4 }, (_, index) => (
+                            <div key={index} className="rounded-xl border border-border-light bg-surface-alt p-4">
+                                <SkeletonBlock className="mb-3 h-4 w-16 rounded-full" />
+                                <SkeletonBlock className="mb-2 h-5 w-4/5 rounded-full" />
+                                <SkeletonBlock className="h-4 w-full rounded-full" />
+                            </div>
+                        ))}
+                    </div>
+                ) : recommendationErrorMessage ? (
+                    <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm font-medium text-amber-700 dark:text-amber-300">
+                        {recommendationErrorMessage}
+                    </div>
+                ) : outfitRecommendation ? (
+                    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.2fr_1fr]">
+                        <div>
+                            <h4 className="mb-3 text-sm font-bold uppercase tracking-wider text-text-muted">Outfit</h4>
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                {outfitRecommendation.outfits.map((item) => (
+                                    <div key={`${item.category}-${item.description}`} className="rounded-xl border border-border-light bg-surface-alt p-4">
+                                        <span className="text-xs font-bold text-primary">{item.category}</span>
+                                        <p className="mt-1 text-base font-bold text-text-heading">{item.description}</p>
+                                        <p className="mt-2 text-sm leading-relaxed text-text-secondary">{item.reason}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-4">
+                            <div>
+                                <h4 className="mb-3 text-sm font-bold uppercase tracking-wider text-text-muted">Actions</h4>
+                                <div className="space-y-3">
+                                    {outfitRecommendation.actions.map((item) => (
+                                        <div key={`${item.category}-${item.description}`} className="flex gap-3 rounded-xl border border-border-light bg-surface-alt p-4">
+                                            <span className="material-symbols-outlined mt-0.5 text-[20px] text-primary">task_alt</span>
+                                            <div>
+                                                <p className="text-sm font-bold text-text-heading">{item.description}</p>
+                                                <p className="mt-1 text-xs leading-relaxed text-text-secondary">{item.reason}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {outfitRecommendation.cautions.length > 0 && (
+                                <div className="rounded-xl border border-orange-500/20 bg-orange-500/10 p-4">
+                                    <h4 className="mb-2 flex items-center gap-2 text-sm font-bold text-orange-700 dark:text-orange-300">
+                                        <span className="material-symbols-outlined text-[18px]">warning</span>
+                                        Caution
+                                    </h4>
+                                    <ul className="space-y-1 text-sm font-medium text-orange-700 dark:text-orange-200">
+                                        {outfitRecommendation.cautions.map((caution) => (
+                                            <li key={caution}>{caution}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="rounded-lg border border-border-light bg-surface-alt px-4 py-3 text-sm font-medium text-text-secondary">
+                        추천 정보가 아직 없습니다.
+                    </div>
+                )}
+            </Card>
             <Card variant="glass">
                 <div className="flex items-center justify-between mb-6 pb-2 border-b border-border-light">
                     <h3 className="text-xl font-bold text-text-heading">7-Day Forecast</h3>
@@ -350,3 +483,6 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+
+

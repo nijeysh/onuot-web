@@ -1,4 +1,4 @@
-import apiClient from '../lib/apiClient';
+﻿import apiClient from '../lib/apiClient';
 import type { WeatherCondition, WeatherData } from '../types/weather';
 
 interface ApiResponse<T> {
@@ -117,6 +117,7 @@ const normalizeWeatherData = (data: BackendWeatherData): WeatherData => ({
     feelsLike: data.current?.feelsLike ?? data.current?.temperature ?? 0,
     humidity: data.current?.humidity ?? 0,
     windSpeed: data.current?.windSpeed ?? 0,
+    precipitation: data.current?.precipitation ?? 0,
     condition: toWeatherCondition(data.current?.condition ?? null),
     description: data.current?.description ?? '날씨 정보 없음',
     pm10: data.current?.pm10 ?? null,
@@ -160,3 +161,5 @@ export const getWeatherData = async (
 
   return normalizeWeatherData(data.data);
 };
+
+
