@@ -2,10 +2,7 @@
 
 ## 🔴 High Priority
 
-- [ ] **WeatherBackground 이미지 로컬화**: `WeatherBackground.tsx`에서 `lh3.googleusercontent.com` 외부 URL로 배경 이미지를 불러오는 중 → 로딩 느림
-  - SVG 애니메이션 또는 CSS gradient로 대체 검토
-  - 또는 이미지를 로컬 `/public/assets/` 에 다운로드하여 사용
-  - 현재 7개 날씨 상태 × 2 테마(라이트/다크) = 14개 이미지 URL
+- [x] **WeatherBackground 앰비언트 그라디언트 개선**: `WeatherBackground.tsx`의 외부 Google 이미지 URL 제거 ➔ 0ms 로딩의 모던 CSS Ambient Gradient & Glow 이펙트로 대체 완료
 
 ## 🟡 Medium Priority
 
